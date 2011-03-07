@@ -1142,7 +1142,7 @@ PROMPT is a prompt string when reading events during event loop."
                      isearch-callback
                      &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
-value of the selected item unless. Almost arguments are same as
+value of the selected item. Almost arguments are same as
 `popup-create' except for KEYMAP, FALLBACK, HELP-DELAY, PROMPT,
 ISEARCH, ISEARCH-CURSOR-COLOR, ISEARCH-KEYMAP, and
 ISEARCH-CALLBACK.
