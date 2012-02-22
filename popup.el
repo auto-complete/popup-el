@@ -649,7 +649,8 @@ PARENT-OFFSET is a row offset from the parent popup."
         for empty-char = (propertize " " 'face face)
         for scroll-bar-char = (if scroll-bar
                                   (cond
-                                   ((<= page-size 1)
+                                   ((and (not (eq scroll-bar :always))
+                                         (<= page-size 1))
                                     empty-char)
                                    ((and (> page-size 1)
                                          (>= cursor (* page-index page-size))
