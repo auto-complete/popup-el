@@ -1,6 +1,6 @@
 ;;; popup.el --- Visual Popup User Interface
 
-;; Copyright (C) 2009, 2010, 2011  Tomohiro Matsuyama
+;; Copyright (C) 2009, 2010, 2011, 2012  Tomohiro Matsuyama
 
 ;; Author: Tomohiro Matsuyama <tomo@cx4a.org>
 ;; Keywords: lisp
@@ -28,8 +28,7 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 
 
