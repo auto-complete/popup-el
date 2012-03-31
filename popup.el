@@ -1136,13 +1136,14 @@ PROMPT is a prompt string when reading events during event loop."
                (sublist (popup-item-sublist item)))
           (unless index (return))
           (if sublist
-              (popup-aif (popup-cascade-menu sublist
-                                             :around nil
-                                             :margin-left (popup-margin-left menu)
-                                             :margin-right (popup-margin-right menu)
-                                             :scroll-bar (popup-scroll-bar menu)
-                                             :parent menu
-                                             :parent-offset index)
+              (popup-aif (let (popup-use-optimized-column-computation)
+                           (popup-cascade-menu sublist
+                                               :around nil
+                                               :margin-left (popup-margin-left menu)
+                                               :margin-right (popup-margin-right menu)
+                                               :scroll-bar (popup-scroll-bar menu)
+                                               :parent menu
+                                               :parent-offset index))
                   (and it (return it)))
             (if (eq binding 'popup-select)
                 (return (popup-item-value-or-self item))))))
