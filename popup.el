@@ -534,7 +534,12 @@ KEYMAP is a keymap that will be put on the popup contents."
           (when around
             (setq bottom (zerop (popup-vertical-motion column direction))))
 
-          (loop for ov in (overlays-in (1- (line-beginning-position)) (1+ (line-end-position)))
+          (loop for ov in (overlays-in (save-excursion
+                                         (beginning-of-visual-line)
+                                         (point))
+                                       (save-excursion
+                                         (end-of-visual-line)
+                                         (point)))
                 when (and (not (overlay-get ov 'popup))
                           (not (overlay-get ov 'popup-item))
                           (or (overlay-get ov 'invisible)
