@@ -239,7 +239,7 @@ buffer."
   parent depth
   face mouse-face selection-face
   margin-left margin-right margin-left-cancel scroll-bar symbol
-  cursor offset scroll-top current-height list padding
+  cursor offset scroll-top current-height list newlines
   pattern original-list)
 
 (defun popup-item-propertize (item &rest properties)
@@ -393,7 +393,7 @@ usual."
     (unless (overlay-get overlay 'dangle)
       (overlay-put overlay 'display (concat prefix (substring content 0 1)))
       (setq prefix nil
-            content (substring content 1)))
+            content (concat (substring content 1))))
     (overlay-put overlay
                  'after-string
                  (concat prefix
@@ -523,15 +523,13 @@ KEYMAP is a keymap that will be put on the popup contents."
                        ;; Calculate direction
                        (popup-calculate-direction height row)))
            (depth (if parent (1+ (popup-depth parent)) 0))
-           padding
+           (newlines (max 0 (+ (- height (count-lines point (point-max))) (if around 1 0))))
            current-column)
-      ;; Case: no room to put overlays
-      (when (eobp)
+      ;; Case: no newlines at the end of the buffer
+      (when (> newlines 0)
         (popup-save-buffer-state
-          (let ((begin (point)))
-            (insert " ")
-            (setq padding (make-overlay begin (point)))
-            (overlay-put padding 'evaporate t))))
+          (goto-char (point-max))
+          (insert (make-string newlines ?\n))))
       
       ;; Case: the popup overflows
       (if overflow
@@ -556,11 +554,11 @@ KEYMAP is a keymap that will be put on the popup contents."
         (setq margin-left-cancel t))
       
       (dotimes (i height)
-        (let (overlay begin w bottom (dangle t) (prefix "") (postfix ""))
+        (let (overlay begin w (dangle t) (prefix "") (postfix ""))
           (when around
-            (setq bottom (zerop (popup-vertical-motion column direction))))
-	  (setq around t)
-          (setq current-column (if bottom 0 (popup-current-physical-column)))
+            (popup-vertical-motion column direction))
+	  (setq around t
+                current-column (popup-current-physical-column))
 
           (when (> current-column column)
             (backward-char)
@@ -568,8 +566,7 @@ KEYMAP is a keymap that will be put on the popup contents."
           (when (< current-column column)
             ;; Extend short buffer lines by popup prefix (line of spaces)
             (setq prefix (make-string
-                          (+ (if (and (not bottom)
-                                      (= current-column 0))
+                          (+ (if (= current-column 0)
                                  (- window-hscroll (current-column))
                                0)
                              (- column current-column))
@@ -577,15 +574,12 @@ KEYMAP is a keymap that will be put on the popup contents."
 
           (setq begin (point))
           (setq w (+ popup-width (length prefix)))
-          (when bottom
-            (setq prefix (concat "\n" prefix)))
           (while (and (not (eolp)) (> w 0))
             (setq dangle nil)
             (decf w (char-width (char-after)))
             (forward-char))
           (if (< w 0)
               (setq postfix (make-string (- w) ? )))
-
 
           (setq overlay (make-overlay begin (point)))
           (overlay-put overlay 'window window)
@@ -621,7 +615,7 @@ KEYMAP is a keymap that will be put on the popup contents."
                             :scroll-top 0
                             :current-height 0
                             :list nil
-                            :padding padding
+                            :newlines newlines
                             :overlays overlays
                             :keymap keymap)))
         (push it popup-instances)
@@ -634,10 +628,14 @@ KEYMAP is a keymap that will be put on the popup contents."
     (mapc 'delete-overlay (popup-overlays popup))
     (setf (popup-overlays popup) nil)
     (setq popup-instances (delq popup popup-instances))
-    (let ((padding (popup-padding popup)))
-      (when (overlayp padding)
+    ;; Restore newlines state
+    (let ((newlines (popup-newlines popup)))
+      (when (> newlines 0)
         (popup-save-buffer-state
-          (delete-region (overlay-start padding) (overlay-end padding))))))
+          (goto-char (point-max))
+          (dotimes (i newlines)
+            (if (= (char-before) ?\n)
+                (delete-char -1)))))))
   nil)
 
 (defun popup-draw (popup)
