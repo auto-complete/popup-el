@@ -132,7 +132,7 @@ untouched."
   (declare (indent 0))
   `(save-excursion
      (let ((buffer-undo-list t)
-           (buffer-read-only nil)
+           (inhibit-read-only t)
            (modified (buffer-modified-p)))
        (unwind-protect
            (progn ,@body)
