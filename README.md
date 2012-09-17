@@ -1,6 +1,8 @@
 popup.el
 ========
 
+[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.png)](http://travis-ci.org/auto-complete/popup-el)
+
 Overview
 --------
 
