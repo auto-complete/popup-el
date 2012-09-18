@@ -49,12 +49,23 @@ into real text."
         (insert x)
         (buffer-string)))))
 
-(defun popup-test-helper-match-contents (contents)
+(defun popup-test-helper-match-points (contents)
+  "Return list of start of first match"
   (if (listp contents)
       (mapcar (lambda (content)
                 (string-match content
                               (popup-test-helper-overlays-to-text)))
               contents)))
+
+(defun popup-test-helper-points-to-column (points)
+  (mapcar
+   (lambda (point)
+     (save-excursion (goto-char point) (current-column)))
+   points))
+
+(defun popup-test-helper-same-all-p (columns &optional value)
+  (let ((res (reduce #'(lambda (x y) (if (eq x y) x nil)) columns)))
+    (if value (eq res value) res)))
 
 (defun popup-test-helper-input (key)
   (push key unread-command-events))
@@ -64,9 +75,10 @@ into real text."
     (popup-set-list popup '("foo" "bar" "baz"))
     (popup-draw popup)
     (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (should (every #'identity
-                   (popup-test-helper-match-contents '("foo" "bar" "baz"))))
-    ))
+    (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
+      (should (every #'identity points))
+      (should (popup-test-helper-same-all-p
+               (popup-test-helper-points-to-column points) 0)))))
 
 (ert-deftest popup-test-delete ()
   (popup-test-with-common-setup
@@ -80,7 +92,7 @@ into real text."
     (popup-hide popup)
     (should (equal (popup-list popup) '("foo" "bar" "baz")))
     (should-not (every #'identity
-                       (popup-test-helper-match-contents '("foo" "bar" "baz"))))
+                       (popup-test-helper-match-points '("foo" "bar" "baz"))))
     ))
 
 (ert-deftest popup-test-tip ()
@@ -101,8 +113,10 @@ canceled. The arguments is whole filtered list of items.
 
 HELP-DELAY is a delay of displaying helps."
      :nowait t)
-    (should
-     (every #'identity
-            (popup-test-helper-match-contents
-             '("CURSOR-COLOR is a cursor color during isearch"))))
+    (let ((points (popup-test-helper-match-points
+                   '("CURSOR-COLOR is a cursor color during isearch"
+                     "KEYMAP is a keymap"))))
+      (should (every #'identity points))
+      (should (popup-test-helper-same-all-p
+               (popup-test-helper-points-to-column points) 0)))
     ))
