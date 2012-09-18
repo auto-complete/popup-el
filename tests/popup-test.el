@@ -4,6 +4,7 @@
 ;; for "every" function
 (require 'cl)
 
+(set-default 'truncate-lines t)
 
 (defmacro popup-test-with-common-setup (&rest body)
   (declare (indent 0) (debug t))
