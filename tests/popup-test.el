@@ -101,12 +101,8 @@ canceled. The arguments is whole filtered list of items.
 
 HELP-DELAY is a delay of displaying helps."
      :nowait t)
-    ;; (should (equal (popup-list popup) '("foo" "bar" "baz")))
     (should
      (every #'identity
             (popup-test-helper-match-contents
              '("CURSOR-COLOR is a cursor color during isearch"))))
     ))
-
-
-
