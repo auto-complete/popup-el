@@ -154,3 +154,43 @@ HELP-DELAY is a delay of displaying helps."
           (should (eq (popup-test-helper-same-all-p
                        (popup-test-helper-points-to-column points)) 1)))
         ))))
+
+(ert-deftest popup-test-folding-long-line-right-top ()
+  (popup-test-with-temp-buffer
+    ;; To use window-width because Emacs 23 does not have window-body-width
+    (insert (make-string (- (window-width) 3) ? ))
+    (popup-test-with-create-popup
+      (popup-tip "long long long long line" :nowait t)
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("long long long long line"))))
+          (should (every #'identity points))
+          (should (eq (line-number-at-pos (car points)) 2))
+          )))))
+
+(ert-deftest popup-test-folding-long-line-left-bottom ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-body-height) 1) ?\n))
+    (popup-test-with-create-popup
+      (popup-tip "long long long long line" :nowait t)
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("long long long long line"))))
+          (should (every #'identity points))
+          (should (eq (line-number-at-pos (car points))
+                      (- (window-body-height) 1)))
+          )))))
+
+(ert-deftest popup-test-folding-long-line-right-bottom ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-body-height) 1) ?\n))
+    (insert (make-string (- (window-width) 3) ? ))
+    (popup-test-with-create-popup
+      (popup-tip "long long long long line" :nowait t)
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("long long long long line"))))
+          (should (every #'identity points))
+          (should (eq (line-number-at-pos (car points))
+                      (- (window-body-height) 1))))
+        ))))
