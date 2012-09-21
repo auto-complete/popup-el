@@ -6,6 +6,9 @@
 
 (set-default 'truncate-lines t)
 
+(when (< (frame-width) (length "long long long long line"))
+  (set-frame-size (selected-frame) 80 35))
+
 (defmacro popup-test-with-create-popup (&rest body)
   (declare (indent 0) (debug t))
   `(let ((popup (popup-create (point) 10 10)))
@@ -20,6 +23,7 @@
   `(save-excursion
      (with-temp-buffer
        (switch-to-buffer (current-buffer))
+       (delete-other-windows)
        (erase-buffer)
        ,@body
        )))
