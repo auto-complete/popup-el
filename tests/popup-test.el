@@ -51,11 +51,13 @@ into real text. Return *text* buffer"
 
 (defun popup-test-helper-match-points (contents)
   "Return list of start of first match"
-  (if (listp contents)
-      (mapcar (lambda (content)
-                (string-match content
-                              (popup-test-helper-overlays-to-text)))
-              contents)))
+  (when (listp contents)
+    (let ((text (buffer-string)))
+      (mapcar
+       (lambda (content)
+         (let ((pos (string-match content text)))
+           (if (null pos) pos (1+ pos))))
+       contents))))
 
 (defun popup-test-helper-points-to-column (points)
   (mapcar
