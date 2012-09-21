@@ -16,10 +16,10 @@
          ,@body
          (popup-delete popup)))))
 
-(defun popup-test-helper-overlays-to-text ()
+(defun popup-test-helper-get-overlays-buffer ()
   "Create a new buffer called *text* containing the visible text
 of the current buffer, ie. it converts overlays containing text
-into real text."
+into real text. Return *text* buffer"
   (interactive)
   (let ((tb (get-buffer-create "*text*"))
         (s (point-min))
@@ -47,7 +47,7 @@ into real text."
     (let ((x (buffer-substring-no-properties s (point-max))))
       (with-current-buffer tb
         (insert x)
-        (buffer-string)))))
+        tb))))
 
 (defun popup-test-helper-match-points (contents)
   "Return list of start of first match"
@@ -75,10 +75,12 @@ into real text."
     (popup-set-list popup '("foo" "bar" "baz"))
     (popup-draw popup)
     (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
-      (should (every #'identity points))
-      (should (popup-test-helper-same-all-p
-               (popup-test-helper-points-to-column points) 0)))))
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
+        (should (every #'identity points))
+        (should (equal (popup-test-helper-points-to-column points) '(0 0 0)))
+        (should (popup-test-helper-same-all-p
+                 (popup-test-helper-points-to-column points) 0))))))
 
 (ert-deftest popup-test-delete ()
   (popup-test-with-common-setup
@@ -91,8 +93,9 @@ into real text."
     (popup-draw popup)
     (popup-hide popup)
     (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (should-not (every #'identity
-                       (popup-test-helper-match-points '("foo" "bar" "baz"))))
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (should-not (every #'identity
+                         (popup-test-helper-match-points '("foo" "bar" "baz")))))
     ))
 
 (ert-deftest popup-test-tip ()
@@ -113,10 +116,11 @@ canceled. The arguments is whole filtered list of items.
 
 HELP-DELAY is a delay of displaying helps."
      :nowait t)
-    (let ((points (popup-test-helper-match-points
-                   '("CURSOR-COLOR is a cursor color during isearch"
-                     "KEYMAP is a keymap"))))
-      (should (every #'identity points))
-      (should (popup-test-helper-same-all-p
-               (popup-test-helper-points-to-column points) 0)))
-    ))
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("CURSOR-COLOR is a cursor color during isearch"
+                       "KEYMAP is a keymap"))))
+        (should (every #'identity points))
+        (should (popup-test-helper-same-all-p
+                 (popup-test-helper-points-to-column points) 0)))
+      )))
