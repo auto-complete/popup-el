@@ -6,15 +6,28 @@
 
 (set-default 'truncate-lines t)
 
-(defmacro popup-test-with-common-setup (&rest body)
+(defmacro popup-test-with-create-popup (&rest body)
+  (declare (indent 0) (debug t))
+  `(let ((popup (popup-create (point) 10 10)))
+     (unwind-protect
+         (progn ,@body)
+       (when ac-menu
+         (popup-delete popup)))
+     ))
+
+(defmacro popup-test-with-temp-buffer (&rest body)
   (declare (indent 0) (debug t))
   `(save-excursion
      (with-temp-buffer
        (switch-to-buffer (current-buffer))
        (erase-buffer)
-       (let ((popup (popup-create (point) 10 10)))
-         ,@body
-         (popup-delete popup)))))
+       ,@body
+       )))
+
+(defmacro popup-test-with-common-setup (&rest body)
+  (declare (indent 0) (debug t))
+  `(popup-test-with-temp-buffer
+     (popup-test-with-create-popup ,@body)))
 
 (defun popup-test-helper-get-overlays-buffer ()
   "Create a new buffer called *text* containing the visible text
@@ -126,3 +139,18 @@ HELP-DELAY is a delay of displaying helps."
         (should (popup-test-helper-same-all-p
                  (popup-test-helper-points-to-column points) 0)))
       )))
+
+(ert-deftest popup-test-culumn ()
+  (popup-test-with-temp-buffer
+    (insert " ")
+    (popup-test-with-create-popup
+      (popup-set-list popup '("foo" "bar" "baz"))
+      (popup-draw popup)
+      (should (equal (popup-list popup) '("foo" "bar" "baz")))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
+          (should (every #'identity points))
+          (should (equal (popup-test-helper-points-to-column points) '(1 1 1)))
+          (should (eq (popup-test-helper-same-all-p
+                       (popup-test-helper-points-to-column points)) 1)))
+        ))))
