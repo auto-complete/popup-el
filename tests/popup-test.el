@@ -14,7 +14,7 @@
   `(let ((popup (popup-create (point) 10 10)))
      (unwind-protect
          (progn ,@body)
-       (when ac-menu
+       (when popup
          (popup-delete popup)))
      ))
 
