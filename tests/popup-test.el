@@ -66,25 +66,26 @@ into real text. Return *text* buffer"
         (insert x)
         tb))))
 
-(defun popup-test-helper-match-points (contents)
+(defun popup-test-helper-match-points (strings)
   "Return list of start of first match"
-  (when (listp contents)
+  (when (listp strings)
     (let ((text (buffer-string)))
       (mapcar
        (lambda (content)
-         (let ((pos (string-match content text)))
+         (let ((pos (string-match (regexp-quote content) text)))
            (if (null pos) pos (1+ pos))))
-       contents))))
+       strings))))
 
-(defun popup-test-helper-points-to-column (points)
+(defun popup-test-helper-points-to-columns (points)
+  "Return list of colum"
   (mapcar
    (lambda (point)
      (save-excursion (goto-char point) (current-column)))
    points))
 
-(defun popup-test-helper-same-all-p (columns &optional value)
-  (let ((res (reduce #'(lambda (x y) (if (eq x y) x nil)) columns)))
-    (if value (eq res value) res)))
+(defun popup-test-helper-same-all-p (seq)
+  "Return first element if `eq' every element of SEQ.If not, return nil."
+  (reduce #'(lambda (x y) (if (eq x y) x nil)) seq))
 
 (defun popup-test-helper-input (key)
   (push key unread-command-events))
@@ -97,9 +98,9 @@ into real text. Return *text* buffer"
     (with-current-buffer (popup-test-helper-get-overlays-buffer)
       (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
         (should (every #'identity points))
-        (should (equal (popup-test-helper-points-to-column points) '(0 0 0)))
-        (should (popup-test-helper-same-all-p
-                 (popup-test-helper-points-to-column points) 0))))))
+        (should (equal (popup-test-helper-points-to-columns points) '(0 0 0)))
+        (should (eq (popup-test-helper-same-all-p
+                     (popup-test-helper-points-to-columns points)) 0))))))
 
 (ert-deftest popup-test-delete ()
   (popup-test-with-common-setup
@@ -140,8 +141,8 @@ HELP-DELAY is a delay of displaying helps."
                      '("CURSOR-COLOR is a cursor color during isearch"
                        "KEYMAP is a keymap"))))
         (should (every #'identity points))
-        (should (popup-test-helper-same-all-p
-                 (popup-test-helper-points-to-column points) 0)))
+        (should (eq (popup-test-helper-same-all-p
+                     (popup-test-helper-points-to-columns points)) 0)))
       )))
 
 (ert-deftest popup-test-culumn ()
@@ -154,7 +155,8 @@ HELP-DELAY is a delay of displaying helps."
       (with-current-buffer (popup-test-helper-get-overlays-buffer)
         (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
           (should (every #'identity points))
-          (should (equal (popup-test-helper-points-to-column points) '(1 1 1)))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(1 1 1)))
           (should (eq (popup-test-helper-same-all-p
                        (popup-test-helper-points-to-column points)) 1)))
         ))))
