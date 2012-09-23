@@ -4,8 +4,6 @@
 ;; for "every" function
 (require 'cl)
 
-(set-default 'truncate-lines t)
-
 (when (< (frame-width) (length "long long long long line"))
   (set-frame-size (selected-frame) 80 35))
 
@@ -127,7 +125,7 @@ into real text. Return *text* buffer"
     ))
 
 (ert-deftest popup-test-tip ()
-  (popup-test-with-common-setup
+  (popup-test-with-temp-buffer
     (popup-tip
      "Start isearch on POPUP. This function is synchronized, meaning
 event loop waits for quiting of isearch.
@@ -165,42 +163,38 @@ HELP-DELAY is a delay of displaying helps."
           (should (every #'identity points))
           (should (equal (popup-test-helper-points-to-columns points)
                          '(1 1 1)))
-          (should (eq (popup-test-helper-same-all-p
-                       (popup-test-helper-points-to-column points)) 1)))
+          )
         ))))
 
 (ert-deftest popup-test-folding-long-line-right-top ()
   (popup-test-with-temp-buffer
     ;; To use window-width because Emacs 23 does not have window-body-width
     (insert (make-string (- (window-width) 3) ? ))
-    (popup-test-with-create-popup
-      (popup-tip "long long long long line" :nowait t)
-      (with-current-buffer (popup-test-helper-get-overlays-buffer)
-        (let ((points (popup-test-helper-match-points
-                       '("long long long long line"))))
-          (should (every #'identity points))
-          (should (eq (line-number-at-pos (car points)) 2))
-          )))))
+    (popup-tip "long long long long line" :nowait t)
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("long long long long line"))))
+        (should (every #'identity points))
+        (should (eq (line-number-at-pos (car points)) 2))
+        ))))
 
 (ert-deftest popup-test-folding-long-line-left-bottom ()
   (popup-test-with-temp-buffer
     (insert (make-string (- (window-body-height) 1) ?\n))
-    (popup-test-with-create-popup
-      (popup-tip "long long long long line" :nowait t)
-      (with-current-buffer (popup-test-helper-get-overlays-buffer)
-        (let ((points (popup-test-helper-match-points
-                       '("long long long long line"))))
-          (should (every #'identity points))
-          (should (eq (line-number-at-pos (car points))
-                      (- (window-body-height) 1)))
-          )))))
+    (popup-tip "long long long long line" :nowait t)
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("long long long long line"))))
+        (should (every #'identity points))
+        (should (eq (line-number-at-pos (car points))
+                    (- (window-body-height) 1)))
+        ))))
 
 (ert-deftest popup-test-folding-long-line-right-bottom ()
   (popup-test-with-temp-buffer
     (insert (make-string (- (window-body-height) 1) ?\n))
     (insert (make-string (- (window-width) 3) ? ))
-    (popup-test-with-create-popup
-      (popup-tip "long long long long line" :nowait t)
+    (popup-tip "long long long long line" :nowait t)
       (with-current-buffer (popup-test-helper-get-overlays-buffer)
         (let ((points (popup-test-helper-match-points
                        '("long long long long line"))))
