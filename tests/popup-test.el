@@ -195,10 +195,46 @@ HELP-DELAY is a delay of displaying helps."
     (insert (make-string (- (window-body-height) 1) ?\n))
     (insert (make-string (- (window-width) 3) ? ))
     (popup-tip "long long long long line" :nowait t)
-      (with-current-buffer (popup-test-helper-get-overlays-buffer)
-        (let ((points (popup-test-helper-match-points
-                       '("long long long long line"))))
-          (should (every #'identity points))
-          (should (eq (line-number-at-pos (car points))
-                      (- (window-body-height) 1))))
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("long long long long line"))))
+        (should (every #'identity points))
+        (should (eq (line-number-at-pos (car points))
+                    (- (window-body-height) 1))))
+      )))
+
+(ert-deftest popup-test-folding-short-line-right-top ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-width) 3) ? ))
+    (popup-tip "bla\nbla\nbla\nbla\nbla" :nowait t)
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("bla"))))
+        (should (every #'identity points))
+        (should (eq (line-number-at-pos (car points)) 2))
         ))))
+
+(ert-deftest popup-test-folding-short-line-left-bottom ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-body-height) 1) ?\n))
+    (popup-tip "bla\nbla\nbla\nbla\nbla" :nowait t)
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("bla"))))
+        (should (every #'identity points))
+        (should (eq (popup-test-helper-same-all-p
+                     (popup-test-helper-points-to-columns points)) 0))
+        ))))
+
+(ert-deftest popup-test-folding-short-line-right-bottom ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-body-height) 1) ?\n))
+    (insert (make-string (- (window-width) 3) ? ))
+    (popup-tip "bla\nbla\nbla\nbla\nbla" :nowait t)
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points
+                     '("bla"))))
+        (should (every #'identity points))
+        (should (eq (line-number-at-pos (car points))
+                    (- (window-body-height) 5))))
+      )))
