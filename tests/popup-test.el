@@ -90,6 +90,14 @@ into real text. Return *text* buffer"
 (defun popup-test-helper-input (key)
   (push key unread-command-events))
 
+;; Test for helper method
+(ert-deftest popup-test-test-helper ()
+  (should (eq (popup-test-helper-same-all-p '(0 0 0)) 0))
+  (should (eq (popup-test-helper-same-all-p '(1 1 1)) 1))
+  (should (eq (popup-test-helper-same-all-p '(0 1 1)) nil))
+  )
+
+;; Test for popup-el
 (ert-deftest popup-test-simple ()
   (popup-test-with-common-setup
     (popup-set-list popup '("foo" "bar" "baz"))
