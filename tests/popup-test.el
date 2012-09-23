@@ -238,3 +238,14 @@ HELP-DELAY is a delay of displaying helps."
         (should (eq (line-number-at-pos (car points))
                     (- (window-body-height) 5))))
       )))
+
+(ert-deftest popup-test-margin-at-middle ()
+  (popup-test-with-temp-buffer
+    (insert " ")
+    (let ((popup (popup-tip "Margin?" :nowait t :margin t)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points '(" Margin? "))))
+          (should (every #'identity points))
+          (should (equal (car (popup-test-helper-points-to-columns points))
+                         0))
+          )))))
