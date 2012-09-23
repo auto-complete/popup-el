@@ -224,6 +224,8 @@ HELP-DELAY is a delay of displaying helps."
         (should (every #'identity points))
         (should (eq (popup-test-helper-same-all-p
                      (popup-test-helper-points-to-columns points)) 0))
+        (should (eq (line-number-at-pos (car points))
+                    (- (window-body-height) 5)))
         ))))
 
 (ert-deftest popup-test-folding-short-line-right-bottom ()
