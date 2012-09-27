@@ -347,3 +347,32 @@ HELP-DELAY is a delay of displaying helps."
           (should (eq (nth 1 (popup-test-helper-points-to-columns last-bounds))
                       (1- (window-width))))
           )))))
+
+(ert-deftest popup-test-menu ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-menu* '("Foo" "Bar" "Baz") :nowait t)))
+      (should (equal (popup-list popup) '("Foo" "Bar" "Baz")))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo" "Bar" "Baz"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          )))))
+
+(ert-deftest popup-test-cascade-menu ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-cascade-menu
+                  '(("Foo" "Foo1" "Foo2") "Bar" "Baz") :nowait t :margin t)))
+      (should (string= (car (popup-list popup)) "Foo"))
+      (should (equal (popup-item-sublist (car (popup-list popup)))
+                     '("Foo1" "Foo2")))
+      (should (equal (popup-item-symbol (car (popup-list popup))) ">"))
+      (should (equal (cdr (popup-list popup)) '("Bar" "Baz")))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo" "Bar" "Baz" "Foo1"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0 nil)))
+          )))))
