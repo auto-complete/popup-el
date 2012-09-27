@@ -251,3 +251,26 @@ HELP-DELAY is a delay of displaying helps."
           (should (equal (car (popup-test-helper-points-to-columns points))
                          0))
           )))))
+
+(ert-deftest popup-test-two-lines ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-tip "Foo\nBar\nBaz" :nowait t :height 2)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points '("Foo" "Bar" "Baz"))))
+          (should (equal points '(2 6 nil)))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 nil)))
+          (should (eq (line-number-at-pos (car points)) 2))
+          )))))
+
+(ert-deftest popup-test-two-lines-bottom ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-body-height) 1) ?\n))
+    (let ((popup (popup-tip "Foo\nBar\nBaz" :nowait t :height 2)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points '("Foo" "Bar" "Baz"))))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 nil)))
+          (should (eq (line-number-at-pos (car points))
+                      (- (window-body-height) 2)))
+          )))))
