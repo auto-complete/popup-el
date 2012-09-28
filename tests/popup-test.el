@@ -436,3 +436,56 @@ HELP-DELAY is a delay of displaying helps."
           (should (equal (popup-test-helper-points-to-columns points)
                          '(0 0 0)))
           )))))
+
+(ert-deftest popup-test-scroll-down ()
+  (popup-test-with-temp-buffer
+    (let ((popup
+           (popup-cascade-menu (loop for x to 100 collect (format "Foo%d" x))
+                               :nowait t :height 10 :margin t :scroll-bar t)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo0" "Foo1" "Foo2"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          ))
+      (should (equal (popup-selected-item popup) "Foo0"))
+      (popup-scroll-down popup 10)
+      (should (equal (popup-selected-item popup) "Foo10"))
+      (popup-scroll-down popup 10)
+      (should (equal (popup-selected-item popup) "Foo20"))
+      (popup-scroll-down popup 100)
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo91" "Foo100" "Foo90"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 nil)))
+          ))
+      )))
+
+(ert-deftest popup-test-scroll-up ()
+  (popup-test-with-temp-buffer
+    (let ((popup
+           (popup-cascade-menu (loop for x to 100 collect (format "Foo%d" x))
+                               :nowait t :height 10 :margin t :scroll-bar t)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo0" "Foo1" "Foo2"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          ))
+      (should (equal (popup-selected-item popup) "Foo0"))
+      (popup-scroll-down popup 100)
+      (should (equal (popup-selected-item popup) "Foo91"))
+      (popup-scroll-up popup 10)
+      (should (equal (popup-selected-item popup) "Foo81"))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo81" "Foo90" "Foo80"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 nil)))
+          ))
+      )))
