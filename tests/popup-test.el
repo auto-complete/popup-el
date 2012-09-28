@@ -376,3 +376,63 @@ HELP-DELAY is a delay of displaying helps."
           (should (equal (popup-test-helper-points-to-columns points)
                          '(0 0 0 nil)))
           )))))
+
+(ert-deftest popup-test-next ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-cascade-menu
+                  '("Foo" "Bar" "Baz") :nowait t :margin t)))
+      (should (equal (popup-list popup) '("Foo" "Bar" "Baz")))
+      (should (equal (popup-selected-item popup) "Foo"))
+      (popup-next popup)
+      (should (equal (popup-selected-item popup) "Bar"))
+      (popup-next popup)
+      (should (equal (popup-selected-item popup) "Baz"))
+      (popup-next popup)
+      (should (equal (popup-selected-item popup) "Foo"))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo" "Bar" "Baz"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          )))))
+
+(ert-deftest popup-test-previous ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-cascade-menu
+                  '("Foo" "Bar" "Baz") :nowait t :margin t)))
+      (should (equal (popup-list popup) '("Foo" "Bar" "Baz")))
+      (should (equal (popup-selected-item popup) "Foo"))
+      (popup-previous popup)
+      (should (equal (popup-selected-item popup) "Baz"))
+      (popup-previous popup)
+      (should (equal (popup-selected-item popup) "Bar"))
+      (popup-previous popup)
+      (should (equal (popup-selected-item popup) "Foo"))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo" "Bar" "Baz"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          )))))
+
+(ert-deftest popup-test-select ()
+  (popup-test-with-temp-buffer
+    (let ((popup (popup-cascade-menu
+                  '("Foo" "Bar" "Baz") :nowait t :margin t)))
+      (should (equal (popup-list popup) '("Foo" "Bar" "Baz")))
+      (should (equal (popup-selected-item popup) "Foo"))
+      (popup-select popup 1)
+      (should (equal (popup-selected-item popup) "Bar"))
+      (popup-select popup 0)
+      (should (equal (popup-selected-item popup) "Foo"))
+      (popup-select popup 2)
+      (should (equal (popup-selected-item popup) "Baz"))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo" "Bar" "Baz"))))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0)))
+          )))))
