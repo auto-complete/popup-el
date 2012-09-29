@@ -78,7 +78,9 @@ into real text. Return *text* buffer"
   "Return list of colum"
   (mapcar
    (lambda (point)
-     (save-excursion (goto-char point) (current-column)))
+     (if point
+         (save-excursion (goto-char point) (current-column))
+       nil))
    points))
 
 (defun popup-test-helper-same-all-p (seq)
@@ -87,6 +89,26 @@ into real text. Return *text* buffer"
 
 (defun popup-test-helper-input (key)
   (push key unread-command-events))
+
+(defun popup-test-helper-in-popup-p ()
+  (let* ((face (get-text-property (point) 'face))
+         (face (if (listp face) face (list face))))
+    (some (lambda (face) (if (memq face '(popup-tip-face popup-face)) t nil))
+          face)))
+
+(defun popup-test-helper-last-popup-line ()
+  "Return (START END) list of last popup line"
+  (save-excursion
+    (end-of-buffer)
+    (let ((end (point)))
+      (while (and (not (popup-test-helper-in-popup-p))
+                  (let ((pos (previous-single-property-change (point) 'face)))
+                    (when pos
+                      (setq end (point))
+                      (goto-char pos))
+                    pos)))
+      (if (popup-test-helper-in-popup-p) `(,(point) ,end) nil)
+      )))
 
 ;; Test for helper method
 (ert-deftest popup-test-test-helper ()
@@ -273,4 +295,55 @@ HELP-DELAY is a delay of displaying helps."
                          '(0 0 nil)))
           (should (eq (line-number-at-pos (car points))
                       (- (window-body-height) 2)))
+          )))))
+
+(ert-deftest popup-test-scroll-bar ()
+  (popup-test-with-temp-buffer
+    (let* ((popup-scroll-bar-foreground-char
+            (propertize "f" 'face 'popup-scroll-bar-foreground-face))
+           (popup-scroll-bar-background-char
+            (propertize "b" 'face 'popup-scroll-bar-background-face))
+           (popup (popup-tip "Foo\nBar\nBaz\nFez\nOz"
+                             :nowait t :height 3 :scroll-bar t :margin t)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foo f" "Bar b" "Baz b" "Fez"))))
+          (should (equal (popup-test-helper-points-to-columns points)
+                         '(0 0 0 nil)))
+          (should (eq (line-number-at-pos (car points)) 2))
+          )))))
+
+(ert-deftest popup-test-scroll-bar-right-no-margin ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-width) 1) ? ))
+    (let* ((popup-scroll-bar-foreground-char
+            (propertize "f" 'face 'popup-scroll-bar-foreground-face))
+           (popup-scroll-bar-background-char
+            (propertize "b" 'face 'popup-scroll-bar-background-face))
+           (popup (popup-tip "Foo\nBar\nBaz\nFez\nOz"
+                             :nowait t :height 3 :scroll-bar t)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Foof" "Barb" "Bazb"))))
+          (should (equal (popup-test-helper-same-all-p
+                          (popup-test-helper-points-to-columns points))
+                         (- (window-width) 5)))
+          (should (eq (line-number-at-pos (car points)) 2))
+          )))))
+
+(ert-deftest popup-test-min-height ()
+  (popup-test-with-temp-buffer
+    (insert (make-string (- (window-width) 1) ? ))
+    (let ((popup (popup-tip "Hello" :nowait t :min-height 10)))
+      (with-current-buffer (popup-test-helper-get-overlays-buffer)
+        (let ((points (popup-test-helper-match-points
+                       '("Hello")))
+              (last-bounds (popup-test-helper-last-popup-line)))
+          (should (eq (line-number-at-pos (car points)) 2))
+          (should (eq
+                   (car (popup-test-helper-points-to-columns points))
+                   (car (popup-test-helper-points-to-columns last-bounds))))
+          (should (eq (line-number-at-pos (car last-bounds)) 11))
+          (should (eq (nth 1 (popup-test-helper-points-to-columns last-bounds))
+                      (1- (window-width))))
           )))))
