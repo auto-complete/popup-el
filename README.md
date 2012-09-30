@@ -44,21 +44,21 @@ Popup Items
 
 Elements of `popup-list` have to be popup items. A popup item is
 substantially a string but it may involve some text-properties. There
-is two ways for making popup items. One is just using strings. Another
-is to use `popup-make-item` function, which just returna the string
-with adding text-properties of its keywords. Effective text-properties
+are two ways to make popup items. One is just using strings. Another
+is to use the `popup-make-item` function, which just returns the string
+after adding text-properties of its keywords. Effective text-properties
 are:
 
 * `value` -- This represents the **real** value of the item. This will
   be used when returning the value but not the item (or string) from
   some synchronous functions such as `popup-menu*`.
 * `face` -- The background face of the item. The value of `popup-face`
-  will be overriden.
+  will be overridden.
 * `selection-face` -- The selection face of the item. The value of
-  `popup-selection-face` will be overriden.
+  `popup-selection-face` will be overridden.
 * `document` -- The documentation string or function of the item.
-* `summary` -- The summary string of the item. This will be shown at
-  inline of the item.
+* `summary` -- The summary string of the item. This will be shown
+  inline with the item.
 * `symbol` -- The symbol character of the item.
 * `sublist` -- The sublist of the item. This is effective only with
   `popup-cascade-menu`.
@@ -88,7 +88,7 @@ popups.
 ### Struct: `popup`
 
 Any instance of `popup` structure has the following fields (some
-unimportant fields was omitted):
+unimportant fields are not listed):
 
 * `point`
 * `row` -- The line number.
@@ -97,8 +97,8 @@ unimportant fields was omitted):
 * `height` -- Max height of `popup` instance.
 * `min-height`
 * `current-height`
-* `direction` -- Positive number means forwarding, negative number
-  means backwarding.
+* `direction` -- Positive number means forward, negative number means
+  backward.
 * `parent` -- The parent of `popup` instance.
 * `face` -- The background face.
 * `selection-face`
@@ -113,7 +113,7 @@ unimportant fields was omitted):
   (strings).
 * `original-list` -- Same as `list` except that this is not filtered.
 
-All of fields can be accessed by `popup-<field>` function.
+All of these fields can be accessed by `popup-<field>` function.
 
 ### Function: `popup-create`
 
@@ -123,15 +123,15 @@ All of fields can be accessed by `popup-<field>` function.
 
 Create a popup instance at `POINT` with `WIDTH` and `HEIGHT`.
 
-`MIN-HEIGHT` is a minimal height of the popup. The default value is 0.
+`MIN-HEIGHT` is the minimal height of the popup. The default value is 0.
 
 If `AROUND` is non-nil, the popup will be displayed around the point
 but not at the point.
 
-`FACE` is a background face of the popup. The default value is
+`FACE` is the background face of the popup. The default value is
 `popup-face`.
 
-`SELECTION-FACE` is a foreground (selection) face of the popup The
+`SELECTION-FACE` is the foreground (selection) face of the popup The
 default value is `popup-face`.
 
 If `SCROLL-BAR` is non-nil, the popup will have a scroll bar at the
@@ -142,9 +142,9 @@ If `MARGIN-LEFT` is non-nil, the popup will have a margin at the left.
 If `MARGIN-RIGHT` is non-nil, the popup will have a margin at the
 right.
 
-`SYMBOL` is a single character which indicates a kind of the item.
+`SYMBOL` is a single character which indicates the kind of the item.
 
-`PARENT` is a parent popup instance. If `PARENT` is omitted, the popup
+`PARENT` is the parent popup instance. If `PARENT` is omitted, the popup
 will be a root instance.
 
 `PARENT-OFFSET` is a row offset from the parent popup.
@@ -239,7 +239,7 @@ Enter incremental search event loop of `POPUP`.
 Tooltips
 --------
 
-Tooltip is an useuful visual UI widget for displaying information
+A tooltip is an useful visual UI widget for displaying information
 something about what cursor points to.
 
 ### Function: `popup-tip`
@@ -248,16 +248,17 @@ something about what cursor points to.
     truncate margin margin-left margin-right scroll-bar parent
     parent-offset nowait prompt
 
-Show a tooltip of `STRING` at `POINT`. This function is synchronized
-unless `NOWAIT` specified. Almost arguments are same as `popup-create`
-except for `TRUNCATE`, `NOWAIT`, and `PROMPT`.
+Show a tooltip with message `STRING` at `POINT`. This function is
+synchronized unless `NOWAIT` specified. Almost all arguments are same as
+`popup-create` except for `TRUNCATE`, `NOWAIT`, and `PROMPT`.
 
 If `TRUNCATE` is non-nil, the tooltip can be truncated.
 
 If `NOWAIT` is non-nil, this function immediately returns the tooltip
 instance without entering event loop.
 
-`PROMPT` is a prompt string when reading events during event loop.
+`PROMPT` is a prompt string used when reading events during the event
+loop.
 
 Here is an example:
 
@@ -267,7 +268,7 @@ Here is an example:
 Popup Menus
 -----------
 
-Popup menu is an useful visual UI widget for requesting users to
+Popup menu is an useful visual UI widget for prompting users to
 select an item of a list.
 
 ### Function: `popup-menu*`
@@ -277,17 +278,17 @@ select an item of a list.
     fallback help-delay nowait prompt isearch isearch-cursor-color
     isearch-keymap isearch-callback => selected-value
 
-Show a popup menu of `LIST` at `POINT`. This function returns a value
-of the selected item. Almost arguments are same as `popup-create`
+Show a popup menu of `LIST` at `POINT`. This function returns the value
+of the selected item. Almost all arguments are same as `popup-create`
 except for `KEYMAP`, `FALLBACK`, `HELP-DELAY`, `PROMPT`, `ISEARCH`,
 `ISEARCH-CURSOR-COLOR`, `ISEARCH-KEYMAP`, and `ISEARCH-CALLBACK`.
 
-If `KEYMAP` is a keymap which is used when processing events during
-event loop.
+If `KEYMAP` is provided, it is a keymap which is used when processing
+events during event loop.
 
-If `FALLBACK` is a function taking two arguments; a key and a
-command. `FALLBACK` is called when no special operation is found on
-the key. The default value is `popup-menu-fallback`, which does
+If `FALLBACK` is provided, it is a function taking two arguments; a key
+and a command. `FALLBACK` is called when no special operation is found
+on the key. The default value is `popup-menu-fallback`, which does
 nothing.
 
 `HELP-DELAY` is a delay of displaying helps.
