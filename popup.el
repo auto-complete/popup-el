@@ -404,10 +404,12 @@ usual."
 (defun* popup-create-line-string (popup string &key margin-left margin-right symbol summary)
   (let* ((popup-width (popup-width popup))
          (summary-width (string-width summary))
-         (content-width (- popup-width
-                           (if (> summary-width 0)
-                               (+ summary-width 2)
-                             0)))
+         (content-width (max
+                         (min popup-width (string-width string))
+                         (- popup-width
+                            (if (> summary-width 0)
+                                (+ summary-width 2)
+                              0))))
          (string (car (popup-substring-by-width string content-width)))
          (string-width (string-width string))
          (spacing (max (- popup-width string-width summary-width) 0)))
