@@ -414,7 +414,9 @@ usual."
     (concat margin-left
             string
             (make-string spacing ? )
-            summary
+            (car
+             (popup-substring-by-width
+              summary (max (- popup-width string-width spacing) 0)))
             symbol
             margin-right)))
 
