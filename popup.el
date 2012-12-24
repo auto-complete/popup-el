@@ -137,8 +137,20 @@ untouched."
        (unwind-protect
            (progn ,@body)
          (set-buffer-modified-p modified)))))
-  
+
+(defun popup-calculate-width (preferred-width-1)
+  (typecase popup-max-menu-width
+    (integer (min popup-max-menu-width preferred-width-1))
+    (float (round (min (* popup-max-menu-width (window-width))
+                       preferred-width-1)))
+    (otherwise preferred-width-1)))
+
 (defun popup-preferred-width (list)
+  "Return the preferred width to show LIST beautifully, taking
+into account `popup-max-menu-width'."
+  (popup-calculate-width (popup-preferred-width-1 list)))
+
+(defun popup-preferred-width-1 (list)
   "Return the preferred width to show LIST beautifully."
   (loop with tab-width = 4
         for item in list
@@ -233,6 +245,20 @@ buffer."
 (defvar popup-scroll-bar-background-char
   (propertize " " 'face 'popup-scroll-bar-background-face)
   "Background character for scroll-bar.")
+
+(defcustom popup-max-menu-width nil
+  "Defines the maximum width of a popup menu."
+  :group 'popup
+  :type '(choice (const :tag "Unlimited" nil)
+                 (integer :tag "Fixed maximum" 30)
+                 (float :tag "Window width ratio" 0.5)))
+
+(make-variable-buffer-local 'popup-max-menu-width)
+
+(defcustom popup-truncated-summary-postfix ""
+  "String appended at the end of a truncated summary"
+  :group 'popup
+  :type 'string)
 
 (defstruct popup
   point row column width height min-height direction overlays keymap
@@ -336,7 +362,7 @@ usual."
   (popup-set-filtered-list popup list)
   (setf (popup-pattern popup) nil)
   (setf (popup-original-list popup) list))
-  
+
 (defun popup-set-filtered-list (popup list)
   (let ((offset
          (if (> (popup-direction popup) 0)
@@ -401,6 +427,7 @@ usual."
                          scroll-bar-char
                          postfix))))
 
+
 (defun* popup-create-line-string (popup string &key margin-left margin-right symbol summary)
   (let* ((popup-width (popup-width popup))
          (summary-width (string-width summary))
@@ -414,9 +441,16 @@ usual."
          (string-width (string-width string))
          (spacing (max (- popup-width string-width summary-width)
                        (if (> popup-width string-width) 1 0)))
+         (summary-postfix-width (string-width popup-truncated-summary-postfix))
+         (available-space-for-summary (- popup-width string-width spacing))
          (truncated-summary
-          (car (popup-substring-by-width
-                summary (max (- popup-width string-width spacing) 0)))))
+          (if (> (string-width summary) available-space-for-summary)
+              (concat
+               (car (popup-substring-by-width
+                     summary (max (- popup-width string-width spacing summary-postfix-width)
+                                  0)))
+               popup-truncated-summary-postfix)
+            summary)))
     (concat margin-left
             string
             (make-string spacing ? )
@@ -536,7 +570,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         (popup-save-buffer-state
           (goto-char (point-max))
           (insert (make-string newlines ?\n))))
-      
+
       ;; Case: the popup overflows
       (if overflow
           (if foldable
@@ -558,7 +592,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         (setq column 0)
         (decf popup-width margin-left)
         (setq margin-left-cancel t))
-      
+
       (dotimes (i height)
         (let (overlay begin w (dangle t) (prefix "") (postfix ""))
           (when around
@@ -688,7 +722,7 @@ KEYMAP is a keymap that will be put on the popup contents."
                       (concat " " (or (popup-item-symbol item) " "))
                     "")
         for summary = (or (popup-item-summary item) "")
-        
+
         do
         ;; Show line and set item to the line
         (popup-set-line-item popup o
@@ -701,7 +735,7 @@ KEYMAP is a keymap that will be put on the popup contents."
                              :symbol sym
                              :summary summary
                              :keymap keymap)
-        
+
         finally
         ;; Remember current height
         (setf (popup-current-height popup) (- o offset))
@@ -975,11 +1009,11 @@ PROMPT is a prompt string when reading events during event loop."
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
   (or margin-right (setq margin-right margin))
-  
+
   (let ((it (popup-fill-string string width popup-tip-max-width)))
     (setq width (car it)
           lines (cdr it)))
-  
+
   (setq tip (popup-create point width height
                           :min-height min-height
                           :around around
