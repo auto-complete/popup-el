@@ -34,6 +34,14 @@
 
 ;;; Utilities
 
+
+(defun calculate-max-width (width)
+  "Determines whether the width desired is 
+character or window proportion based, And returns the result."
+  (typecase max-width
+    (integer max-width)
+    (float (round (* max-width (window-width))))))
+
 (defvar popup-use-optimized-column-computation t
   "Use the optimized column computation routine.
 If there is a problem, please set it nil.")
@@ -473,6 +481,7 @@ MIN-HEIGHT is a minimal height of the popup. The default value is
 0.
 
 MAX-WIDTH is the maximum width of the popup. The default value is nil (no limit)
+if a floating point, the value refers to the ratio of the window. if an int, limit is in characters.
 
 If AROUND is non-nil, the popup will be displayed around the
 point but not at the point.
@@ -505,8 +514,7 @@ KEYMAP is a keymap that will be put on the popup contents."
     (setq point
           (if parent (popup-child-point parent parent-offset) (point))))
   (if max-width 
-    (if (> width max-width) (setq width max-width) nil) 
-    nil)
+    (setq width (min width (calculate-max-width max-width))))
   (save-excursion
     (goto-char point)
     (let* ((row (line-number-at-pos))
