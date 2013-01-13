@@ -455,6 +455,7 @@ number at the point."
                       height
                       &key
                       min-height
+                      max-width
                       around
                       (face 'popup-face)
                       mouse-face
@@ -470,6 +471,8 @@ number at the point."
 
 MIN-HEIGHT is a minimal height of the popup. The default value is
 0.
+
+MAX-WIDTH is the maximum width of the popup. The default value is nil (no limit)
 
 If AROUND is non-nil, the popup will be displayed around the
 point but not at the point.
@@ -501,7 +504,9 @@ KEYMAP is a keymap that will be put on the popup contents."
   (unless point
     (setq point
           (if parent (popup-child-point parent parent-offset) (point))))
-
+  (if max-width 
+    (if (> width max-width) (setq width max-width) nil) 
+    nil)
   (save-excursion
     (goto-char point)
     (let* ((row (line-number-at-pos))
