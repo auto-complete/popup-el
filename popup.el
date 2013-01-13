@@ -40,7 +40,7 @@
 character or window proportion based, And returns the result."
   (typecase max-width
     (integer max-width)
-    (float (round (* max-width (window-width))))))
+    (float (* (ceiling (/ (round (* max-width (window-width))) 10.0)) 10))))
 
 (defvar popup-use-optimized-column-computation t
   "Use the optimized column computation routine.
