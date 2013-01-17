@@ -237,7 +237,7 @@ buffer."
 (defstruct popup
   point row column width height min-height direction overlays keymap
   parent depth
-  face mouse-face selection-face
+  face mouse-face selection-face summary-face
   margin-left margin-right margin-left-cancel scroll-bar symbol
   cursor offset scroll-top current-height list newlines
   pattern original-list)
@@ -674,6 +674,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         with popup-face = (popup-face popup)
         with mouse-face = (popup-mouse-face popup)
         with selection-face = (popup-selection-face popup)
+        with summary-face = (popup-summary-face popup)
         with list = (popup-list popup)
         with length = (length list)
         with thum-size = (max (/ (* height height) (max length 1)) 1)
@@ -723,6 +724,7 @@ KEYMAP is a keymap that will be put on the popup contents."
                              :scroll-bar-char scroll-bar-char
                              :symbol sym
                              :summary summary
+                             :summary-face summary-face
                              :keymap keymap)
         
         finally
