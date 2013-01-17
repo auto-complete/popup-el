@@ -367,13 +367,26 @@ usual."
     (and (eq (overlay-get overlay 'display) nil)
          (eq (overlay-get overlay 'after-string) nil))))
 
-(defun* popup-set-line-item (popup line &key item face mouse-face margin-left margin-right scroll-bar-char symbol summary keymap)
+(defun* popup-set-line-item (popup
+                             line
+                             &key
+                             item
+                             face
+                             mouse-face
+                             margin-left
+                             margin-right
+                             scroll-bar-char
+                             symbol
+                             summary
+                             summary-face
+                             keymap)
   (let* ((overlay (popup-line-overlay popup line))
          (content (popup-create-line-string popup (popup-x-to-string item)
                                             :margin-left margin-left
                                             :margin-right margin-right
                                             :symbol symbol
-                                            :summary summary))
+                                            :summary summary
+                                            :summary-face summary-face))
          (start 0)
          (prefix (overlay-get overlay 'prefix))
          (postfix (overlay-get overlay 'postfix))
