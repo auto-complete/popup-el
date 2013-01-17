@@ -1059,6 +1059,11 @@ PROMPT is a prompt string when reading events during event loop."
   "Face for popup menu selection."
   :group 'popup)
 
+(defface popup-menu-summary-face
+  '((t (:background "lightgray" :foreground "dimgray")))
+  "Face for popup summary."
+  :group 'popup)
+
 (defvar popup-menu-show-tip-function 'popup-tip
   "Function used for showing tooltip by `popup-menu-show-quick-help'.")
 
@@ -1269,6 +1274,7 @@ isearch canceled. The arguments is whole filtered list of items."
                            :face 'popup-menu-face
                            :mouse-face 'popup-menu-mouse-face
                            :selection-face 'popup-menu-selection-face
+                           :summary-face 'popup-menu-summary-face
                            :margin-left margin-left
                            :margin-right margin-right
                            :scroll-bar scroll-bar
