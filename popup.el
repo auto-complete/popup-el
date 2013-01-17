@@ -401,7 +401,14 @@ usual."
                          scroll-bar-char
                          postfix))))
 
-(defun* popup-create-line-string (popup string &key margin-left margin-right symbol summary)
+(defun* popup-create-line-string (popup
+                                  string
+                                  &key
+                                  margin-left
+                                  margin-right
+                                  symbol
+                                  summary
+                                  summary-face)
   (let* ((popup-width (popup-width popup))
          (summary-width (string-width summary))
          (content-width (max
@@ -417,6 +424,9 @@ usual."
          (truncated-summary
           (car (popup-substring-by-width
                 summary (max (- popup-width string-width spacing) 0)))))
+    (when summary-face
+      (put-text-property 0 (length truncated-summary)
+                         'face summary-face truncated-summary))
     (concat margin-left
             string
             (make-string spacing ? )
