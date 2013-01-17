@@ -681,7 +681,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         with popup-face = (popup-face popup)
         with mouse-face = (popup-mouse-face popup)
         with selection-face = (popup-selection-face popup)
-        with summary-face = (popup-summary-face popup)
+        with summary-face-0 = (popup-summary-face popup)
         with list = (popup-list popup)
         with length = (length list)
         with thum-size = (max (/ (* height height) (max length 1)) 1)
@@ -702,6 +702,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         for face = (if (= i cursor)
                        (or (popup-item-selection-face item) selection-face)
                      (or (popup-item-face item) popup-face))
+        for summary-face = (unless (= i cursor) summary-face-0)
         for empty-char = (propertize " " 'face face)
         for scroll-bar-char = (if scroll-bar
                                   (cond
