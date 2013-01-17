@@ -213,6 +213,11 @@ buffer."
   "Face for popup."
   :group 'popup)
 
+(defface popup-summary-face
+  '((t (:background "lightgray" :foreground "dimgray")))
+  "Face for popup summary."
+  :group 'popup)
+
 (defface popup-scroll-bar-foreground-face
   '((t (:background "black")))
   "Foreground face for scroll-bar."
@@ -482,6 +487,7 @@ number at the point."
                       (face 'popup-face)
                       mouse-face
                       (selection-face face)
+                      (summary-face 'popup-summary-face)
                       scroll-bar
                       margin-left
                       margin-right
@@ -634,6 +640,7 @@ KEYMAP is a keymap that will be put on the popup contents."
                             :face face
                             :mouse-face mouse-face
                             :selection-face selection-face
+                            :summary-face summary-face
                             :margin-left margin-left
                             :margin-right margin-right
                             :margin-left-cancel margin-left-cancel
