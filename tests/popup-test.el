@@ -7,15 +7,6 @@
 (when (< (frame-width) (length "long long long long line"))
   (set-frame-size (selected-frame) 80 35))
 
-(defmacro popup-test-with-create-popup (&rest body)
-  (declare (indent 0) (debug t))
-  `(let ((popup (popup-create (point) 10 10)))
-     (unwind-protect
-         (progn ,@body)
-       (when popup
-         (popup-delete popup)))
-     ))
-
 (defmacro popup-test-with-temp-buffer (&rest body)
   (declare (indent 0) (debug t))
   `(save-excursion
@@ -25,11 +16,6 @@
        (erase-buffer)
        ,@body
        )))
-
-(defmacro popup-test-with-common-setup (&rest body)
-  (declare (indent 0) (debug t))
-  `(popup-test-with-temp-buffer
-     (popup-test-with-create-popup ,@body)))
 
 (defun popup-test-helper-get-overlays-buffer ()
   "Create a new buffer called *text* containing the visible text
@@ -118,8 +104,11 @@ into real text. Return *text* buffer"
   )
 
 ;; Test for popup-el
+(defvar popup nil)
+
 (ert-deftest popup-test-simple ()
-  (popup-test-with-common-setup
+  (popup-test-with-temp-buffer
+    (setq popup (popup-create (point) 10 10))
     (popup-set-list popup '("foo" "bar" "baz"))
     (popup-draw popup)
     (should (equal (popup-list popup) '("foo" "bar" "baz")))
@@ -131,12 +120,14 @@ into real text. Return *text* buffer"
                      (popup-test-helper-points-to-columns points)) 0))))))
 
 (ert-deftest popup-test-delete ()
-  (popup-test-with-common-setup
+  (popup-test-with-temp-buffer
+    (setq popup (popup-create (point) 10 10))
     (popup-delete popup)
     (should-not (popup-live-p popup))))
 
 (ert-deftest popup-test-hide ()
-  (popup-test-with-common-setup
+  (popup-test-with-temp-buffer
+    (setq popup (popup-create (point) 10 10))
     (popup-set-list popup '("foo" "bar" "baz"))
     (popup-draw popup)
     (popup-hide popup)
@@ -176,17 +167,17 @@ HELP-DELAY is a delay of displaying helps."
 (ert-deftest popup-test-culumn ()
   (popup-test-with-temp-buffer
     (insert " ")
-    (popup-test-with-create-popup
-      (popup-set-list popup '("foo" "bar" "baz"))
-      (popup-draw popup)
-      (should (equal (popup-list popup) '("foo" "bar" "baz")))
-      (with-current-buffer (popup-test-helper-get-overlays-buffer)
-        (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
-          (should (every #'identity points))
-          (should (equal (popup-test-helper-points-to-columns points)
-                         '(1 1 1)))
-          )
-        ))))
+    (setq popup (popup-create (point) 10 10))
+    (popup-set-list popup '("foo" "bar" "baz"))
+    (popup-draw popup)
+    (should (equal (popup-list popup) '("foo" "bar" "baz")))
+    (with-current-buffer (popup-test-helper-get-overlays-buffer)
+      (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
+        (should (every #'identity points))
+        (should (equal (popup-test-helper-points-to-columns points)
+                       '(1 1 1)))
+        )
+      )))
 
 (ert-deftest popup-test-folding-long-line-right-top ()
   (popup-test-with-temp-buffer
