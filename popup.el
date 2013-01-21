@@ -214,7 +214,7 @@ buffer."
   :group 'popup)
 
 (defface popup-summary-face
-  '((t (:background "lightgray" :foreground "dimgray")))
+  '((t (:inherit popup-face :foreground "dimgray")))
   "Face for popup summary."
   :group 'popup)
 
@@ -1046,7 +1046,7 @@ PROMPT is a prompt string when reading events during event loop."
 ;;; Popup Menu
 
 (defface popup-menu-face
-  '((t (:background "lightgray" :foreground "black")))
+  '((t (:inherit popup-face)))
   "Face for popup menu."
   :group 'popup)
 
@@ -1061,7 +1061,7 @@ PROMPT is a prompt string when reading events during event loop."
   :group 'popup)
 
 (defface popup-menu-summary-face
-  '((t (:background "lightgray" :foreground "dimgray")))
+  '((t (:inherit popup-summary-face)))
   "Face for popup summary."
   :group 'popup)
 
