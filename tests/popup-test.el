@@ -96,6 +96,49 @@ into real text. Return *text* buffer"
       (if (popup-test-helper-in-popup-p) `(,(point) ,end) nil)
       )))
 
+(defun popup-test-helper-line-move-visual (arg)
+  "This function is workaround. Because `line-move-visual' can not work well in
+batch mode."
+  (let ((cur-col
+         (- (current-column)
+            (save-excursion (vertical-motion 0) (current-column)))))
+    (vertical-motion arg)
+    (move-to-column (+ (current-column) cur-col))))
+
+(defun popup-test-helper-rectangle-match (str)
+  (goto-char (point-max))
+  (let ((strings (split-string str)))
+    (search-backward (car strings) nil t)
+    (every
+     'identity
+     (mapcar
+      (lambda (elem)
+        (popup-test-helper-line-move-visual 1)
+        (looking-at (regexp-quote elem)))
+      (cdr strings)))))
+
+(defun popup-test-helper-buffer-contents ()
+  (with-output-to-string
+    (loop with start = (point-min)
+          for overlay in (sort* (overlays-in (point-min) (point-max))
+                                '< :key 'overlay-start)
+          for overlay-start = (overlay-start overlay)
+          for overlay-end = (overlay-end overlay)
+          for prefix = (buffer-substring-no-properties start overlay-start)
+          for befstr = (overlay-get overlay 'before-string)
+          for substr = (or (overlay-get overlay 'display)
+                           (buffer-substring-no-properties
+                            overlay-start overlay-end))
+          for aftstr = (overlay-get overlay 'after-string)
+          do (princ prefix)
+          unless (overlay-get overlay 'invisible) do
+          (when befstr (princ befstr))
+          (princ substr)
+          (when aftstr (princ aftstr))
+          do (setq start overlay-end)
+          finally (princ (buffer-substring-no-properties start (point-max))))
+    ))
+
 ;; Test for helper method
 (ert-deftest popup-test-test-helper ()
   (should (eq (popup-test-helper-same-all-p '(0 0 0)) 0))
@@ -108,16 +151,17 @@ into real text. Return *text* buffer"
 
 (ert-deftest popup-test-simple ()
   (popup-test-with-temp-buffer
-    (setq popup (popup-create (point) 10 10))
-    (popup-set-list popup '("foo" "bar" "baz"))
-    (popup-draw popup)
-    (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (with-current-buffer (popup-test-helper-get-overlays-buffer)
-      (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
-        (should (every #'identity points))
-        (should (equal (popup-test-helper-points-to-columns points) '(0 0 0)))
-        (should (eq (popup-test-helper-same-all-p
-                     (popup-test-helper-points-to-columns points)) 0))))))
+    (insert (popup-test-with-temp-buffer
+              (setq popup (popup-create (point) 10 10))
+              (popup-set-list popup '("foo" "bar" "baz"))
+              (popup-draw popup)
+              (should (equal (popup-list popup) '("foo" "bar" "baz")))
+              (popup-test-helper-buffer-contents)))
+    (should (eq t (popup-test-helper-rectangle-match "\
+foo
+bar
+baz")))
+    (should (eq (current-column) 0))))
 
 (ert-deftest popup-test-delete ()
   (popup-test-with-temp-buffer
@@ -127,20 +171,23 @@ into real text. Return *text* buffer"
 
 (ert-deftest popup-test-hide ()
   (popup-test-with-temp-buffer
-    (setq popup (popup-create (point) 10 10))
-    (popup-set-list popup '("foo" "bar" "baz"))
-    (popup-draw popup)
-    (popup-hide popup)
-    (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (with-current-buffer (popup-test-helper-get-overlays-buffer)
-      (should-not (every #'identity
-                         (popup-test-helper-match-points '("foo" "bar" "baz")))))
-    ))
+    (insert (popup-test-with-temp-buffer
+              (setq popup (popup-create (point) 10 10))
+              (popup-set-list popup '("foo" "bar" "baz"))
+              (popup-draw popup)
+              (popup-hide popup)
+              (should (equal (popup-list popup) '("foo" "bar" "baz")))
+              (popup-test-helper-buffer-contents)))
+    (should-not (eq t (popup-test-helper-rectangle-match "\
+foo
+bar
+baz")))))
 
 (ert-deftest popup-test-tip ()
   (popup-test-with-temp-buffer
-    (popup-tip
-     "Start isearch on POPUP. This function is synchronized, meaning
+    (insert (popup-test-with-temp-buffer
+              (popup-tip
+               "Start isearch on POPUP. This function is synchronized, meaning
 event loop waits for quiting of isearch.
 
 CURSOR-COLOR is a cursor color during isearch. The default value
@@ -154,30 +201,29 @@ CALLBACK, if specified, after isearch finished or isearch
 canceled. The arguments is whole filtered list of items.
 
 HELP-DELAY is a delay of displaying helps."
-     :nowait t)
-    (with-current-buffer (popup-test-helper-get-overlays-buffer)
-      (let ((points (popup-test-helper-match-points
-                     '("CURSOR-COLOR is a cursor color during isearch"
-                       "KEYMAP is a keymap"))))
-        (should (every #'identity points))
-        (should (eq (popup-test-helper-same-all-p
-                     (popup-test-helper-points-to-columns points)) 0)))
-      )))
+               :nowait t)
+              (popup-test-helper-buffer-contents)))
+    (should-not (eq t (popup-test-helper-rectangle-match "\
+KEYMAP is a keymap which is used when processing events during
+event loop. The default value is `popup-isearch-keymap'.")))
+    ))
 
-(ert-deftest popup-test-culumn ()
+(ert-deftest popup-test-column ()
   (popup-test-with-temp-buffer
-    (insert " ")
-    (setq popup (popup-create (point) 10 10))
-    (popup-set-list popup '("foo" "bar" "baz"))
-    (popup-draw popup)
-    (should (equal (popup-list popup) '("foo" "bar" "baz")))
-    (with-current-buffer (popup-test-helper-get-overlays-buffer)
-      (let ((points (popup-test-helper-match-points '("foo" "bar" "baz"))))
-        (should (every #'identity points))
-        (should (equal (popup-test-helper-points-to-columns points)
-                       '(1 1 1)))
-        )
-      )))
+    (popup-test-with-temp-buffer
+      (insert (popup-test-with-temp-buffer
+                (insert " ")
+                (setq popup (popup-create (point) 10 10))
+                (popup-set-list popup '("foo" "bar" "baz"))
+                (popup-draw popup)
+                (should (equal (popup-list popup) '("foo" "bar" "baz")))
+                (popup-test-helper-buffer-contents)))
+      (should (eq t (popup-test-helper-rectangle-match "\
+foo
+bar
+baz")))
+      (should (eq (current-column) 1)))
+    ))
 
 (ert-deftest popup-test-folding-long-line-right-top ()
   (popup-test-with-temp-buffer
