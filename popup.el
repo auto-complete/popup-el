@@ -35,7 +35,7 @@
 ;;; Utilities
 
 
-(defun popup-calculate-max-width (width)
+(defun popup-calculate-max-width (max-width)
   "Determines whether the width desired is
 character or window proportion based, And returns the result."
   (typecase max-width
