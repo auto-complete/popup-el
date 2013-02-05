@@ -118,26 +118,24 @@ batch mode."
       (cdr strings)))))
 
 (defun popup-test-helper-buffer-contents ()
-  (with-output-to-string
-    (loop with start = (point-min)
-          for overlay in (sort* (overlays-in (point-min) (point-max))
-                                '< :key 'overlay-start)
-          for overlay-start = (overlay-start overlay)
-          for overlay-end = (overlay-end overlay)
-          for prefix = (buffer-substring-no-properties start overlay-start)
-          for befstr = (overlay-get overlay 'before-string)
-          for substr = (or (overlay-get overlay 'display)
-                           (buffer-substring-no-properties
-                            overlay-start overlay-end))
-          for aftstr = (overlay-get overlay 'after-string)
-          do (princ prefix)
-          unless (overlay-get overlay 'invisible) do
-          (when befstr (princ befstr))
-          (princ substr)
-          (when aftstr (princ aftstr))
-          do (setq start overlay-end)
-          finally (princ (buffer-substring-no-properties start (point-max))))
-    ))
+  (loop with start = (point-min)
+        with contents
+        for overlay in (sort* (overlays-in (point-min) (point-max))
+                              '< :key 'overlay-start)
+        for overlay-start = (overlay-start overlay)
+        for overlay-end = (overlay-end overlay)
+        for prefix = (buffer-substring start overlay-start)
+        for befstr = (overlay-get overlay 'before-string)
+        for substr = (or (overlay-get overlay 'display)
+                         (buffer-substring overlay-start overlay-end))
+        for aftstr = (overlay-get overlay 'after-string)
+        collect prefix into contents
+        unless (overlay-get overlay 'invisible) collect
+        (concat befstr substr aftstr) into contents
+        do (setq start overlay-end)
+        finally (return (concat (apply 'concat contents)
+                                (buffer-substring start (point-max))))
+        ))
 
 ;; Test for helper method
 (ert-deftest popup-test-test-helper ()
