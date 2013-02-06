@@ -123,16 +123,34 @@ batch mode."
       (let ((end (point)))
         (while (and (not (bobp))
                     (not (popup-test-helper-in-popup-p)))
+          (setq end (point))
           (goto-char (or (previous-single-property-change (point) 'face)
                          (point-min))))
         (if (popup-test-helper-in-popup-p)
             ;; todo visual line
-            (line-number-at-pos (point)) nil)
+            (line-number-at-pos end) nil)
+        ))))
+
+(defun popup-test-helper-popup-end-column ()
+  (let ((buffer-contents (popup-test-helper-buffer-contents)))
+    (with-temp-buffer
+      (insert buffer-contents)
+      (goto-char (point-max))
+      (let ((end (point)))
+        (while (and (not (bobp))
+                    (not (popup-test-helper-in-popup-p)))
+          (setq end (point))
+          (goto-char (or (previous-single-property-change (point) 'face)
+                         (point-min))))
+        (when (popup-test-helper-in-popup-p)
+          (goto-char end)
+          (current-column))
         ))))
 
 (defun popup-test-helper-debug ()
   (let ((buffer-contents (popup-test-helper-buffer-contents)))
     (with-current-buffer (get-buffer-create "*dump*")
+      (erase-buffer)
       (insert buffer-contents)
       (buffer-string)
       )))
@@ -287,7 +305,6 @@ bla
 bla
 bla
 bla" :nowait t)
-    (message (popup-test-helper-debug))
     (should (popup-test-helper-rectangle-match "\
 bla
 bla
@@ -337,10 +354,27 @@ bla"))
   (popup-test-with-common-setup
     (insert " ")
     (popup-tip "Margin?" :nowait t :margin t)
-    (should (popup-test-helper-rectangle-match "Margin?"))
-    ;; Pending:
-    ;; (should (eq (popup-test-helper-popup-beginning-column)
-    ;;             1))
+    (should (eq (popup-test-helper-popup-beginning-column)
+                0))
+    (should (popup-test-helper-rectangle-match " Margin? "))
+    ))
+
+(ert-deftest popup-test-margin-left ()
+  (popup-test-with-common-setup
+   (popup-tip "Margin?" :nowait t :margin t)
+   (should (eq (popup-test-helper-popup-beginning-column)
+               0))
+   ;; Pending: #19
+   ;; (should (popup-test-helper-rectangle-match " Margin? "))
+   ))
+
+(ert-deftest popup-test-margin-right ()
+  (popup-test-with-common-setup
+    (insert (make-string (- (window-width) 1) ? ))
+    (popup-tip "Margin?" :nowait t :margin t)
+    (should (popup-test-helper-rectangle-match " Margin? "))
+    ;; Pending: #19
+    ;; (should (< (popup-test-helper-popup-end-column) (window-width)))
     ))
 
 (ert-deftest popup-test-height-limit ()
@@ -416,8 +450,31 @@ Bazb"))
       (should-not (popup-test-helper-rectangle-match "Oz"))
       (should (eq (popup-test-helper-popup-beginning-line) 2))
       (should (eq (popup-test-helper-popup-end-line)  4))
-      ;; (should (eq (popup-test-helper-popup-beginning-column)
-      ;;             (- (window-width) 5)))
+      )))
+
+(ert-deftest popup-test-scroll-bar-right-margin ()
+  (popup-test-with-common-setup
+    (insert (make-string (- (window-width) 1) ? ))
+    (let ((popup-scroll-bar-foreground-char
+           (propertize "f" 'face 'popup-scroll-bar-foreground-face))
+          (popup-scroll-bar-background-char
+           (propertize "b" 'face 'popup-scroll-bar-background-face)))
+      (popup-tip "\
+Foo
+Bar
+Baz
+Fez
+Oz"
+                 :nowait t :height 3 :scroll-bar t :margin t)
+      (should-not (popup-test-helper-rectangle-match "Fez"))
+      (should-not (popup-test-helper-rectangle-match "Oz"))
+      (should (eq (popup-test-helper-popup-beginning-line) 2))
+      (should (eq (popup-test-helper-popup-end-line)  4))
+      ;; Pending: #21
+      ;;       (should (popup-test-helper-rectangle-match "\
+      ;; Foof
+      ;; Barb
+      ;; Bazb"))
       )))
 
 (ert-deftest popup-test-min-height ()
@@ -543,4 +600,38 @@ Foo2"))
     (should (popup-test-helper-rectangle-match "Foo80"))
     (should-not (popup-test-helper-rectangle-match "Foo81"))
     (should (eq (popup-test-helper-popup-beginning-line) 2))
+    ))
+
+(ert-deftest popup-test-two-tip ()
+  (popup-test-with-common-setup
+   (popup-tip "\
+Foo
+Bar" :nowait t)
+   (save-excursion (insert "\n"))
+   (popup-tip "\
+Baz
+Qux" :nowait t)
+   ;; Pending: #20
+   ;;    (should (popup-test-helper-rectangle-match "\
+   ;; Foo
+   ;; Bar"))
+   ;;    (should (popup-test-helper-rectangle-match "\
+   ;; Baz
+   ;; Qux"))
+   ))
+
+(defun popup-test-helper-input (key)
+  (push key unread-command-events))
+
+(ert-deftest popup-test-isearch ()
+  (popup-test-with-common-setup
+    (popup-test-helper-create-popup "\
+foo
+bar
+baz")
+    (popup-isearch-update popup "a")
+    (should (popup-test-helper-rectangle-match "\
+bar
+baz"))
+    (should-not (popup-test-helper-rectangle-match "foo"))
     ))
