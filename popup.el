@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 
 
@@ -198,6 +198,11 @@ buffer."
                        (vector (logior (or (get (car it) 'ascii-character)
                                            0)
                                        (cadr it))))))))
+
+(defun popup-position (item list)
+  (let ((r (memq item list)))
+    (when r
+      (- (length list) (length r)))))
 
 
 
@@ -1174,7 +1179,7 @@ PROMPT is a prompt string when reading events during event loop."
        ((memq binding '(popup-select popup-open))
         (let* ((item (or (popup-menu-item-of-mouse-event (elt key 0))
                          (popup-selected-item menu)))
-               (index (position item (popup-list menu)))
+               (index (popup-position item (popup-list menu)))
                (sublist (popup-item-sublist item)))
           (unless index (return))
           (if sublist
