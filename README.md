@@ -265,6 +265,12 @@ Here is an example:
     (popup-tip "Hello, World!")
     ;; reach here after the tooltip disappeared
 
+### Function: `popup-tip-propertized`
+
+A version of `popup-tip` that doesn't strip text properties (faces)
+from the string. Can be used to customize tooltip appearance beyond
+a single `popup-tip-face`. Takes the same arguments as `popup-tip`.
+
 Popup Menus
 -----------
 
