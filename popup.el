@@ -835,16 +835,14 @@ KEYMAP is a keymap that will be put on the popup contents."
 (defun popup-page-next (popup)
   "Select next item of POPUP per `popup-height' range.
 Pages down through POPUP."
-  (let ((counter 0))
-    (dotimes (counter (1- (popup-height popup)))
-      (popup-next popup))))
+  (dotimes (counter (1- (popup-height popup)))
+    (popup-next popup)))
 
 (defun popup-page-previous (popup)
   "Select previous item of POPUP per `popup-height' range.
 Pages up through POPUP."
-  (let ((counter 0))
-    (dotimes (counter (1- (popup-height popup)))
-      (popup-previous popup))))
+  (dotimes (counter (1- (popup-height popup)))
+    (popup-previous popup)))
 
 (defun popup-scroll-down (popup &optional n)
   "Scroll down N of POPUP and draw."
