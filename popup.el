@@ -603,9 +603,11 @@ KEYMAP is a keymap that will be put on the popup contents."
           (when (< current-column column)
             ;; Extend short buffer lines by popup prefix (line of spaces)
             (setq prefix (make-string
-                          (+ (if (= current-column 0)
-                                 (- window-hscroll (current-column))
-                               0)
+                          (+ 
+			   (if (= current-column 0)
+			       0
+			       ;(- window-hscroll (current-column))
+			     0)
                              (- column current-column))
                           ? )))
 
