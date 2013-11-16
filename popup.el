@@ -987,7 +987,7 @@ HELP-DELAY is a delay of displaying helps."
 
 (defvar popup-tip-max-width 80)
 
-(defun* popup-tip (string
+(defun* popup-tip-propertized (string
                    &key
                    point
                    (around t)
@@ -1004,7 +1004,7 @@ HELP-DELAY is a delay of displaying helps."
                    nowait
                    prompt
                    &aux tip lines)
-  "Show a tooltip of STRING at POINT. This function is
+  "Show a tooltip of STRING with properties at POINT. This function is
 synchronized unless NOWAIT specified. Almost arguments are same
 as `popup-create' except for TRUNCATE, NOWAIT, and PROMPT.
 
@@ -1016,8 +1016,6 @@ tooltip instance without entering event loop.
 PROMPT is a prompt string when reading events during event loop."
   (if (bufferp string)
       (setq string (with-current-buffer string (buffer-string))))
-  ;; TODO strip text (mainly face) properties
-  (setq string (substring-no-properties string))
 
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
@@ -1054,6 +1052,13 @@ PROMPT is a prompt string when reading events during event loop."
           t))
     (unless nowait
       (popup-delete tip))))
+
+(defun popup-tip (string &rest args)
+  "Show a tooltip of STRING without properties at POINT. This function
+is the same as `popup-tip-propertized' except that it strips text
+properties."
+  ;; strip text (mainly face) properties
+  (apply 'popup-tip-propertized (substring-no-properties string) args))
 
 
 
