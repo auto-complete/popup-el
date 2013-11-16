@@ -603,9 +603,11 @@ KEYMAP is a keymap that will be put on the popup contents."
           (when (< current-column column)
             ;; Extend short buffer lines by popup prefix (line of spaces)
             (setq prefix (make-string
-                          (+ (if (= current-column 0)
-                                 (- window-hscroll (current-column))
-                               0)
+                          (+ 
+			   (if (= current-column 0)
+			       0
+			       ;(- window-hscroll (current-column))
+			     0)
                              (- column current-column))
                           ? )))
 
@@ -884,6 +886,30 @@ Pages up through POPUP."
        (<= 32 char)
        (<= char 126)))
 
+(defun popup-isearch-filter-list-by-doc (pattern list)
+  (loop with regexp = (regexp-quote pattern)
+	for item in list
+	for docstring = (popup-item-documentation item)
+	do
+	
+	(unless (stringp item)
+          (setq item (popup-item-propertize (popup-x-to-string item)
+                                            'value item)))
+
+	if (and docstring (string-match regexp docstring))
+	collect
+	(let ((beg 0)
+	      (end (length item)))
+	  (alter-text-property 0 (length item) 'face
+			       (lambda (prop)
+				 (unless (eq prop 'popup-isearch-match)
+				   prop))
+			       item)
+	  (put-text-property beg end
+			     'face 'popup-isearch-match
+			     item)
+	  item)))
+
 (defun popup-isearch-filter-list (pattern list)
   (loop with regexp = (regexp-quote pattern)
         for item in list
@@ -910,11 +936,14 @@ Pages up through POPUP."
                             (propertize pattern 'face 'isearch-fail)
                           pattern)))
 
-(defun popup-isearch-update (popup pattern &optional callback)
+(defun popup-isearch-update (popup pattern &optional callback filter)
   (setf (popup-cursor popup) 0
         (popup-scroll-top popup) 0
         (popup-pattern popup) pattern)
-  (let ((list (popup-isearch-filter-list pattern (popup-original-list popup))))
+  (unless (functionp filter)
+    (setq filter 'popup-isearch-filter-list))
+
+  (let ((list (funcall filter pattern (popup-original-list popup))))
     (popup-set-filtered-list popup list)
     (if callback
         (funcall callback list)))
@@ -925,7 +954,8 @@ Pages up through POPUP."
                        (cursor-color popup-isearch-cursor-color)
                        (keymap popup-isearch-keymap)
                        callback
-                       help-delay)
+                       help-delay
+		       filter)
   "Start isearch on POPUP. This function is synchronized, meaning
 event loop waits for quiting of isearch.
 
@@ -972,7 +1002,7 @@ HELP-DELAY is a delay of displaying helps."
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
                 (return nil)))
-              (popup-isearch-update popup pattern callback))))
+              (popup-isearch-update popup pattern callback filter))))
       (if old-cursor-color
           (set-cursor-color old-cursor-color)))))
 
