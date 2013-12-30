@@ -36,6 +36,14 @@
 
 ;;; Utilities
 
+
+(defun popup-calculate-max-width (max-width)
+  "Determines whether the width desired is
+character or window proportion based, And returns the result."
+  (typecase max-width
+    (integer max-width)
+    (float (* (ceiling (/ (round (* max-width (window-width))) 10.0)) 10))))
+
 (defvar popup-use-optimized-column-computation t
   "Use the optimized column computation routine.
 If there is a problem, please set it nil.")
@@ -485,6 +493,7 @@ number at the point."
                       height
                       &key
                       min-height
+                      max-width
                       around
                       (face 'popup-face)
                       mouse-face
@@ -501,6 +510,10 @@ number at the point."
 
 MIN-HEIGHT is a minimal height of the popup. The default value is
 0.
+
+MAX-WIDTH is the maximum width of the popup. The default value is
+nil (no limit). if a floating point, the value refers to the ratio of
+the window. if an int, limit is in characters.
 
 If AROUND is non-nil, the popup will be displayed around the
 point but not at the point.
@@ -532,7 +545,8 @@ KEYMAP is a keymap that will be put on the popup contents."
   (unless point
     (setq point
           (if parent (popup-child-point parent parent-offset) (point))))
-
+  (when max-width 
+    (setq width (min width (popup-calculate-max-width max-width))))
   (save-excursion
     (goto-char point)
     (let* ((row (line-number-at-pos))
@@ -994,6 +1008,7 @@ HELP-DELAY is a delay of displaying helps."
                    width
                    (height 15)
                    min-height
+                   max-width
                    truncate
                    margin
                    margin-left
@@ -1029,6 +1044,7 @@ PROMPT is a prompt string when reading events during event loop."
   
   (setq tip (popup-create point width height
                           :min-height min-height
+                          :max-width max-width
                           :around around
                           :margin-left margin-left
                           :margin-right margin-right
@@ -1230,6 +1246,7 @@ PROMPT is a prompt string when reading events during event loop."
                      (around t)
                      (width (popup-preferred-width list))
                      (height 15)
+                     max-width
                      margin
                      margin-left
                      margin-right
@@ -1289,6 +1306,7 @@ isearch canceled. The arguments is whole filtered list of items."
       ;; Make scroll-bar space as margin-right
       (decf margin-right))
   (setq menu (popup-create point width height
+                           :max-width max-width
                            :around around
                            :face 'popup-menu-face
                            :mouse-face 'popup-menu-mouse-face
