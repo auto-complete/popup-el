@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 
 (defconst popup-version "0.5.0")
 
@@ -140,6 +140,8 @@ untouched."
            (progn ,@body)
          (set-buffer-modified-p modified)))))
   
+(defsubst popup-item-summary (item)             (popup-item-property item 'summary))
+
 (defun popup-preferred-width (list)
   "Return the preferred width to show LIST beautifully."
   (loop with tab-width = 4
@@ -293,7 +295,6 @@ ITEM is not string."
 (defsubst popup-item-mouse-face (item)          (popup-item-property item 'popup-mouse-face))
 (defsubst popup-item-selection-face (item)      (popup-item-property item 'selection-face))
 (defsubst popup-item-document (item)            (popup-item-property item 'document))
-(defsubst popup-item-summary (item)             (popup-item-property item 'summary))
 (defsubst popup-item-symbol (item)              (popup-item-property item 'symbol))
 (defsubst popup-item-sublist (item)             (popup-item-property item 'sublist))
 
@@ -302,6 +303,12 @@ ITEM is not string."
     (if (functionp doc)
         (setq doc (funcall doc (popup-item-value-or-self item))))
     doc))
+
+(defvar popup-menu-show-tip-function 'popup-tip
+  "Function used for showing tooltip by `popup-menu-show-quick-help'.")
+
+(defvar popup-menu-show-quick-help-function 'popup-menu-show-quick-help
+  "Function used for showing quick help by `popup-menu*'.")
 
 (defun popup-item-show-help-1 (item)
   (let ((doc (popup-item-documentation item)))
@@ -1079,12 +1086,6 @@ PROMPT is a prompt string when reading events during event loop."
   "Face for popup summary."
   :group 'popup)
 
-(defvar popup-menu-show-tip-function 'popup-tip
-  "Function used for showing tooltip by `popup-menu-show-quick-help'.")
-
-(defvar popup-menu-show-quick-help-function 'popup-menu-show-quick-help
-  "Function used for showing quick help by `popup-menu*'.")
-
 (defun popup-menu-show-help (menu &optional persist item)
   (popup-item-show-help (or item (popup-selected-item menu)) persist))
 
@@ -1188,7 +1189,7 @@ PROMPT is a prompt string when reading events during event loop."
        ((memq binding '(popup-select popup-open))
         (let* ((item (or (popup-menu-item-of-mouse-event (elt key 0))
                          (popup-selected-item menu)))
-               (index (position item (popup-list menu)))
+               (index (cl-position item (popup-list menu)))
                (sublist (popup-item-sublist item)))
           (unless index (return))
           (if sublist
@@ -1223,6 +1224,32 @@ PROMPT is a prompt string when reading events during event loop."
         (call-interactively binding))
        (t
         (funcall fallback key (key-binding key)))))))
+
+(defvar popup-menu-keymap
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\r"        'popup-select)
+    (define-key map "\C-f"      'popup-open)
+    (define-key map [right]     'popup-open)
+    (define-key map "\C-b"      'popup-close)
+    (define-key map [left]      'popup-close)
+
+    (define-key map "\C-n"      'popup-next)
+    (define-key map [down]      'popup-next)
+    (define-key map "\C-p"      'popup-previous)
+    (define-key map [up]        'popup-previous)
+
+    (define-key map [next]      'popup-page-next)
+    (define-key map [prior]     'popup-page-previous)
+
+    (define-key map [f1]        'popup-help)
+    (define-key map (kbd "\C-?") 'popup-help)
+
+    (define-key map "\C-s"      'popup-isearch)
+
+    (define-key map [mouse-1]   'popup-select)
+    (define-key map [mouse-4]   'popup-previous)
+    (define-key map [mouse-5]   'popup-next)
+    map))
 
 (defun* popup-menu* (list
                      &key
@@ -1331,32 +1358,6 @@ the sub menu."
                  list)
          :symbol t
          args))
-
-(defvar popup-menu-keymap
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\r"        'popup-select)
-    (define-key map "\C-f"      'popup-open)
-    (define-key map [right]     'popup-open)
-    (define-key map "\C-b"      'popup-close)
-    (define-key map [left]      'popup-close)
-
-    (define-key map "\C-n"      'popup-next)
-    (define-key map [down]      'popup-next)
-    (define-key map "\C-p"      'popup-previous)
-    (define-key map [up]        'popup-previous)
-
-    (define-key map [next]      'popup-page-next)
-    (define-key map [prior]     'popup-page-previous)
-
-    (define-key map [f1]        'popup-help)
-    (define-key map (kbd "\C-?") 'popup-help)
-
-    (define-key map "\C-s"      'popup-isearch)
-
-    (define-key map [mouse-1]   'popup-select)
-    (define-key map [mouse-4]   'popup-previous)
-    (define-key map [mouse-5]   'popup-next)
-    map))
 
 (provide 'popup)
 ;;; popup.el ends here
