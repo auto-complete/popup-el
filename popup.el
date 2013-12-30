@@ -788,6 +788,16 @@ KEYMAP is a keymap that will be put on the popup contents."
           (setq hidden nil))))
     hidden))
 
+(defun popup-jump (popup cursor)
+  "Jump to a position specified by CURSOR of POPUP and draw."
+  (let ((scroll-top (popup-scroll-top popup)))
+    ;; Do not change page as much as possible.
+    (unless (and (<= scroll-top cursor)
+                 (< cursor (+ scroll-top (popup-height popup))))
+      (setf (popup-scroll-top popup) cursor))
+    (setf (popup-cursor popup) cursor)
+    (popup-draw popup)))
+
 (defun popup-select (popup i)
   "Select the item at I of POPUP and draw."
   (setq i (+ i (popup-offset popup)))
@@ -1230,6 +1240,7 @@ PROMPT is a prompt string when reading events during event loop."
                      (around t)
                      (width (popup-preferred-width list))
                      (height 15)
+                     initial-cursor
                      margin
                      margin-left
                      margin-right
@@ -1303,7 +1314,9 @@ isearch canceled. The arguments is whole filtered list of items."
   (unwind-protect
       (progn
         (popup-set-list menu list)
-        (popup-draw menu)
+        (if initial-cursor
+            (popup-jump menu initial-cursor)
+          (popup-draw menu))
         (if nowait
             menu
           (popup-menu-event-loop menu keymap fallback
