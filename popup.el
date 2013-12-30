@@ -1240,7 +1240,6 @@ PROMPT is a prompt string when reading events during event loop."
                      (around t)
                      (width (popup-preferred-width list))
                      (height 15)
-                     initial-cursor
                      margin
                      margin-left
                      margin-right
@@ -1248,6 +1247,7 @@ PROMPT is a prompt string when reading events during event loop."
                      symbol
                      parent
                      parent-offset
+                     cursor
                      (keymap popup-menu-keymap)
                      (fallback 'popup-menu-fallback)
                      help-delay
@@ -1314,8 +1314,8 @@ isearch canceled. The arguments is whole filtered list of items."
   (unwind-protect
       (progn
         (popup-set-list menu list)
-        (if initial-cursor
-            (popup-jump menu initial-cursor)
+        (if cursor
+            (popup-jump menu cursor)
           (popup-draw menu))
         (if nowait
             menu
