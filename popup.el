@@ -72,7 +72,7 @@ splitting with WIDTH."
            with w = 0
            for l from 0
            for c in (append string nil)
-           while (<= (incf w (char-width c)) width)
+           while (<= (cl-incf w (char-width c)) width)
            finally return
            (if (< l len)
                (cons (substring string 0 l) (substring string l))
@@ -140,18 +140,6 @@ untouched."
        (unwind-protect
            (progn ,@body)
          (set-buffer-modified-p modified)))))
-  
-(defun popup-preferred-width (list)
-  "Return the preferred width to show LIST beautifully."
-  (cl-loop with tab-width = 4
-           for item in list
-           for summary = (popup-item-summary item)
-           maximize (string-width (popup-x-to-string item)) into width
-           if (stringp summary)
-           maximize (+ (string-width summary) 2) into summary-width
-           finally return
-           (let ((total (+ (or width 0) (or summary-width 0))))
-             (* (ceiling (/ total 10.0)) 10))))
 
 (defun popup-window-full-width-p (&optional window)
   "A portable version of `window-full-width-p'."
@@ -320,14 +308,14 @@ ITEM is not string."
       (cl-loop do (clear-this-command-keys)
                for key = (read-key-sequence-vector nil)
                do
-               (case (key-binding key)
-                 ('scroll-other-window
+               (cl-case (key-binding key)
+                 (scroll-other-window
                   (scroll-other-window))
-                 ('scroll-other-window-down
+                 (scroll-other-window-down
                   (scroll-other-window-down nil))
-                 (t
+                 (otherwise
                   (setq unread-command-events (append key unread-command-events))
-                  (return)))))))
+                  (cl-return)))))))
 
 (defun popup-item-show-help (item &optional persist)
   "Display the documentation of ITEM with `display-buffer'. If
@@ -573,22 +561,22 @@ KEYMAP is a keymap that will be put on the popup contents."
       (if overflow
           (if foldable
               (progn
-                (decf column (- popup-width margin-left margin-right))
+                (cl-decf column (- popup-width margin-left margin-right))
                 (unless around (move-to-column column)))
             (when (not truncate-lines)
               ;; Truncate.
               (let ((d (1+ (- popup-width (- window-width column)))))
-                (decf popup-width d)
-                (decf width d)))
-            (decf column margin-left))
-        (decf column margin-left))
+                (cl-decf popup-width d)
+                (cl-decf width d)))
+            (cl-decf column margin-left))
+        (cl-decf column margin-left))
 
       ;; Case: no space at the left
       (when (and (null parent)
                  (< column 0))
         ;; Cancel margin left
         (setq column 0)
-        (decf popup-width margin-left)
+        (cl-decf popup-width margin-left)
         (setq margin-left-cancel t))
       
       (dotimes (i height)
@@ -614,7 +602,7 @@ KEYMAP is a keymap that will be put on the popup contents."
           (setq w (+ popup-width (length prefix)))
           (while (and (not (eolp)) (> w 0))
             (setq dangle nil)
-            (decf w (char-width (char-after)))
+            (cl-decf w (char-width (char-after)))
             (forward-char))
           (if (< w 0)
               (setq postfix (make-string (- w) ? )))
@@ -757,10 +745,10 @@ KEYMAP is a keymap that will be put on the popup contents."
                                             :scroll-bar-char scroll-bar-char
                                             :symbol symbol
                                             :summary "")
-                       (incf o)))
+                       (cl-incf o)))
                    (while (< o height)
                      (popup-hide-line popup o)
-                     (incf o)))
+                     (cl-incf o)))
                (cl-loop with h = (if min-height (- height min-height) offset)
                         for o from 0 below offset
                         if (< o h)
@@ -838,7 +826,7 @@ KEYMAP is a keymap that will be put on the popup contents."
             scroll-top (max (- length height) 0)))
      ((= cursor (1- scroll-top))
       ;; Go to previous page
-      (decf scroll-top)))
+      (cl-decf scroll-top)))
     (setf (popup-cursor popup) cursor
           (popup-scroll-top popup) scroll-top)
     (popup-draw popup)))
@@ -889,6 +877,9 @@ Pages up through POPUP."
     (define-key map "\C-h"      'popup-isearch-delete)
     (define-key map (kbd "DEL") 'popup-isearch-delete)
     map))
+
+(defvar popup-menu-show-quick-help-function 'popup-menu-show-quick-help
+  "Function used for showing quick help by `popup-menu*'.")
 
 (defsubst popup-isearch-char-p (char)
   (and (integerp char)
@@ -956,7 +947,7 @@ HELP-DELAY is a delay of displaying helps."
         (old-cursor-color (frame-parameter (selected-frame) 'cursor-color))
         prompt key binding)
     (unwind-protect
-        (block nil
+        (cl-block nil
           (if cursor-color
               (set-cursor-color cursor-color))
           (while t
@@ -972,17 +963,17 @@ HELP-DELAY is a delay of displaying helps."
                      (popup-isearch-char-p (aref key 0)))
                 (setq pattern (concat pattern key)))
                ((eq binding 'popup-isearch-done)
-                (return nil))
+                (cl-return nil))
                ((eq binding 'popup-isearch-cancel)
                 (popup-isearch-update popup "" callback)
-                (return t))
+                (cl-return t))
                ((eq binding 'popup-isearch-delete)
                 (if (> (length pattern) 0)
                     (setq pattern (substring pattern 0 (1- (length pattern))))))
                (t
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
-                (return nil)))
+                (cl-return nil)))
               (popup-isearch-update popup pattern callback))))
       (if old-cursor-color
           (set-cursor-color old-cursor-color)))))
@@ -1093,9 +1084,6 @@ PROMPT is a prompt string when reading events during event loop."
 (defvar popup-menu-show-tip-function 'popup-tip
   "Function used for showing tooltip by `popup-menu-show-quick-help'.")
 
-(defvar popup-menu-show-quick-help-function 'popup-menu-show-quick-help
-  "Function used for showing quick help by `popup-menu*'.")
-
 (defun popup-menu-show-help (menu &optional persist item)
   (popup-item-show-help (or item (popup-selected-item menu)) persist))
 
@@ -1128,8 +1116,8 @@ PROMPT is a prompt string when reading events during event loop."
 
 (defun popup-menu-item-of-mouse-event (event)
   (when (and (consp event)
-             (memq (first event) '(mouse-1 mouse-2 mouse-3 mouse-4 mouse-5)))
-    (let* ((position (second event))
+             (memq (cl-first event) '(mouse-1 mouse-2 mouse-3 mouse-4 mouse-5)))
+    (let* ((position (cl-second event))
            (object (elt position 4)))
       (when (consp object)
         (get-text-property (cdr object) 'popup-item (car object))))))
@@ -1174,7 +1162,7 @@ PROMPT is a prompt string when reading events during event loop."
                                  isearch-keymap
                                  isearch-callback
                                  &aux key binding)
-  (block nil
+  (cl-block nil
     (while (popup-live-p menu)
       (and isearch
            (popup-isearch menu
@@ -1192,16 +1180,16 @@ PROMPT is a prompt string when reading events during event loop."
           (push (read-event prompt) unread-command-events)))
        ((eq (lookup-key (current-global-map) key) 'keyboard-quit)
         (keyboard-quit)
-        (return))
+        (cl-return))
        ((eq binding 'popup-close)
         (if (popup-parent menu)
-            (return)))
+            (cl-return)))
        ((memq binding '(popup-select popup-open))
         (let* ((item (or (popup-menu-item-of-mouse-event (elt key 0))
                          (popup-selected-item menu)))
                (index (cl-position item (popup-list menu)))
                (sublist (popup-item-sublist item)))
-          (unless index (return))
+          (unless index (cl-return))
           (if sublist
               (popup-aif (let (popup-use-optimized-column-computation)
                            (popup-cascade-menu sublist
@@ -1211,9 +1199,9 @@ PROMPT is a prompt string when reading events during event loop."
                                                :scroll-bar (popup-scroll-bar menu)
                                                :parent menu
                                                :parent-offset index))
-                  (and it (return it)))
+                  (and it (cl-return it)))
             (if (eq binding 'popup-select)
-                (return (popup-item-value-or-self item))))))
+                (cl-return (popup-item-value-or-self item))))))
        ((eq binding 'popup-next)
         (popup-next menu))
        ((eq binding 'popup-previous)
@@ -1234,6 +1222,44 @@ PROMPT is a prompt string when reading events during event loop."
         (call-interactively binding))
        (t
         (funcall fallback key (key-binding key)))))))
+
+(defun popup-preferred-width (list)
+  "Return the preferred width to show LIST beautifully."
+  (cl-loop with tab-width = 4
+           for item in list
+           for summary = (popup-item-summary item)
+           maximize (string-width (popup-x-to-string item)) into width
+           if (stringp summary)
+           maximize (+ (string-width summary) 2) into summary-width
+           finally return
+           (let ((total (+ (or width 0) (or summary-width 0))))
+             (* (ceiling (/ total 10.0)) 10))))
+
+(defvar popup-menu-keymap
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\r"        'popup-select)
+    (define-key map "\C-f"      'popup-open)
+    (define-key map [right]     'popup-open)
+    (define-key map "\C-b"      'popup-close)
+    (define-key map [left]      'popup-close)
+
+    (define-key map "\C-n"      'popup-next)
+    (define-key map [down]      'popup-next)
+    (define-key map "\C-p"      'popup-previous)
+    (define-key map [up]        'popup-previous)
+
+    (define-key map [next]      'popup-page-next)
+    (define-key map [prior]     'popup-page-previous)
+
+    (define-key map [f1]        'popup-help)
+    (define-key map (kbd "\C-?") 'popup-help)
+
+    (define-key map "\C-s"      'popup-isearch)
+
+    (define-key map [mouse-1]   'popup-select)
+    (define-key map [mouse-4]   'popup-previous)
+    (define-key map [mouse-5]   'popup-next)
+    map))
 
 (cl-defun popup-menu* (list
                        &key
@@ -1299,7 +1325,7 @@ isearch canceled. The arguments is whole filtered list of items."
            (integerp margin-right)
            (> margin-right 0))
       ;; Make scroll-bar space as margin-right
-      (decf margin-right))
+      (cl-decf margin-right))
   (setq menu (popup-create point width height
                            :around around
                            :face 'popup-menu-face
@@ -1345,32 +1371,6 @@ the sub menu."
                  list)
          :symbol t
          args))
-
-(defvar popup-menu-keymap
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\r"        'popup-select)
-    (define-key map "\C-f"      'popup-open)
-    (define-key map [right]     'popup-open)
-    (define-key map "\C-b"      'popup-close)
-    (define-key map [left]      'popup-close)
-
-    (define-key map "\C-n"      'popup-next)
-    (define-key map [down]      'popup-next)
-    (define-key map "\C-p"      'popup-previous)
-    (define-key map [up]        'popup-previous)
-
-    (define-key map [next]      'popup-page-next)
-    (define-key map [prior]     'popup-page-previous)
-
-    (define-key map [f1]        'popup-help)
-    (define-key map (kbd "\C-?") 'popup-help)
-
-    (define-key map "\C-s"      'popup-isearch)
-
-    (define-key map [mouse-1]   'popup-select)
-    (define-key map [mouse-4]   'popup-previous)
-    (define-key map [mouse-5]   'popup-next)
-    map))
 
 (provide 'popup)
 ;;; popup.el ends here
