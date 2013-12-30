@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 
 (defconst popup-version "0.5.0")
 
@@ -1188,7 +1188,7 @@ PROMPT is a prompt string when reading events during event loop."
        ((memq binding '(popup-select popup-open))
         (let* ((item (or (popup-menu-item-of-mouse-event (elt key 0))
                          (popup-selected-item menu)))
-               (index (position item (popup-list menu)))
+               (index (cl-position item (popup-list menu)))
                (sublist (popup-item-sublist item)))
           (unless index (return))
           (if sublist
