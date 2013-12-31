@@ -1,8 +1,6 @@
 (require 'ert)
 
 (require 'popup)
-;; for "every" function
-(require 'cl-lib)
 
 (when (< (frame-width) (length "long long long long line"))
   (set-frame-size (selected-frame) 80 35))
