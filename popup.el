@@ -1004,6 +1004,7 @@ HELP-DELAY is a delay of displaying helps."
                      parent
                      parent-offset
                      nowait
+                     nostrip
                      prompt
                      &aux tip lines)
   "Show a tooltip of STRING at POINT. This function is
@@ -1018,8 +1019,10 @@ tooltip instance without entering event loop.
 PROMPT is a prompt string when reading events during event loop."
   (if (bufferp string)
       (setq string (with-current-buffer string (buffer-string))))
-  ;; TODO strip text (mainly face) properties
-  (setq string (substring-no-properties string))
+
+  (unless nostrip
+    ;; TODO strip text (mainly face) properties
+    (setq string (substring-no-properties string)))
 
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
