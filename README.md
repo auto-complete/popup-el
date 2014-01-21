@@ -246,16 +246,18 @@ something about what cursor points to.
 
     popup-tip string &key point around width height min-height
     truncate margin margin-left margin-right scroll-bar parent
-    parent-offset nowait prompt
+    parent-offset nowait nostrip prompt
 
 Show a tooltip with message `STRING` at `POINT`. This function is
 synchronized unless `NOWAIT` specified. Almost all arguments are same as
-`popup-create` except for `TRUNCATE`, `NOWAIT`, and `PROMPT`.
+`popup-create` except for `TRUNCATE`, `NOWAIT`, `NOSTRIP` and `PROMPT`.
 
 If `TRUNCATE` is non-nil, the tooltip can be truncated.
 
 If `NOWAIT` is non-nil, this function immediately returns the tooltip
 instance without entering event loop.
+
+If `NOSTRIP` is non-nil, `STRING` properties are not stripped.
 
 `PROMPT` is a prompt string used when reading events during the event
 loop.
