@@ -117,13 +117,17 @@ All of these fields can be accessed by `popup-<field>` function.
 
 ### Function: `popup-create`
 
-    popup-create point width height &key min-height around face
+    popup-create point width height &key min-height max-width around face
     selection-face scroll-bar margin-left margin-right symbol parent
     parent-offset => popup
 
 Create a popup instance at `POINT` with `WIDTH` and `HEIGHT`.
 
 `MIN-HEIGHT` is the minimal height of the popup. The default value is 0.
+
+`MAX-WIDTH` is the maximum width of the popup. The default value is
+nil (no limit). If a floating point, the value refers to the ratio of
+the window. If an integer, limit is in characters.
 
 If `AROUND` is non-nil, the popup will be displayed around the point
 but not at the point.
@@ -244,7 +248,7 @@ something about what cursor points to.
 
 ### Function: `popup-tip`
 
-    popup-tip string &key point around width height min-height
+    popup-tip string &key point around width height min-height max-width
     truncate margin margin-left margin-right scroll-bar parent
     parent-offset nowait nostrip prompt
 
