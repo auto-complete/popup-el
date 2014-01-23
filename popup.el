@@ -556,7 +556,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         (popup-save-buffer-state
           (goto-char (point-max))
           (insert (make-string newlines ?\n))))
-      
+
       ;; Case: the popup overflows
       (if overflow
           (if foldable
@@ -578,7 +578,7 @@ KEYMAP is a keymap that will be put on the popup contents."
         (setq column 0)
         (cl-decf popup-width margin-left)
         (setq margin-left-cancel t))
-      
+
       (dotimes (i height)
         (let (overlay begin w (dangle t) (prefix "") (postfix ""))
           (when around
@@ -1027,11 +1027,11 @@ PROMPT is a prompt string when reading events during event loop."
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
   (or margin-right (setq margin-right margin))
-  
+
   (let ((it (popup-fill-string string width popup-tip-max-width)))
     (setq width (car it)
           lines (cdr it)))
-  
+
   (setq tip (popup-create point width height
                           :min-height min-height
                           :around around
