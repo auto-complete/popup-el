@@ -1016,6 +1016,8 @@ If TRUNCATE is non-nil, the tooltip can be truncated.
 If NOWAIT is non-nil, this function immediately returns the
 tooltip instance without entering event loop.
 
+If `NOSTRIP` is non-nil, `STRING` properties are not stripped.
+
 PROMPT is a prompt string when reading events during event loop."
   (if (bufferp string)
       (setq string (with-current-buffer string (buffer-string))))
