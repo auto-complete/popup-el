@@ -1192,7 +1192,7 @@ PROMPT is a prompt string when reading events during event loop."
                           :help-delay help-delay)
            (keyboard-quit))
       (setq key (popup-menu-read-key-sequence keymap prompt help-delay))
-      (setq binding (ignore-errors (lookup-key keymap key)))
+      (setq binding (and key (lookup-key keymap key)))
       (cond
        ((or (null key) (zerop (length key)))
         (unless (funcall popup-menu-show-quick-help-function menu nil :prompt prompt)
