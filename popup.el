@@ -1379,10 +1379,9 @@ If the popup menu format is not cascade, This value is no need."
   (unwind-protect
       (progn
         (popup-set-list menu
-                        (cl-loop with idx = 0
-                                 for e in list
-                                 collect (popup-make-item e :rawindex idx)
-                                 do (incf idx)))
+                        (cl-loop for e in list
+                                 for idx = 0 then (1+ idx)
+                                 collect (popup-make-item e :rawindex idx)))
         (if cursor
             (popup-jump menu cursor)
           (popup-draw menu))
