@@ -1305,6 +1305,7 @@ PROMPT is a prompt string when reading events during event loop."
                        (isearch-cursor-color popup-isearch-cursor-color)
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
+		       initial-index
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost arguments are same as
@@ -1338,7 +1339,10 @@ during event loop. The default value is `popup-isearch-keymap'.
 
 ISEARCH-CALLBACK is a function taking one argument.  `popup-menu'
 calls ISEARCH-CALLBACK, if specified, after isearch finished or
-isearch canceled. The arguments is whole filtered list of items."
+isearch canceled. The arguments is whole filtered list of items.
+
+If `INITIAL-INDEX' is non-nil, this is an initial index value for
+`popup-select'. Only positive integer is valid."
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
   (or margin-right (setq margin-right margin))
@@ -1366,6 +1370,9 @@ isearch canceled. The arguments is whole filtered list of items."
         (if cursor
             (popup-jump menu cursor)
           (popup-draw menu))
+	(when initial-index
+	  (popup-select menu
+			(min (- (length list) 1) initial-index)))
         (if nowait
             menu
           (popup-menu-event-loop menu keymap fallback
