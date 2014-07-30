@@ -1317,6 +1317,7 @@ PROMPT is a prompt string when reading events during event loop."
                        (isearch-cursor-color popup-isearch-cursor-color)
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
+		       (initial-index 0)
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost arguments are same as
@@ -1378,6 +1379,12 @@ isearch canceled. The arguments is whole filtered list of items."
         (if cursor
             (popup-jump menu cursor)
           (popup-draw menu))
+	(when initial-index
+	  (popup-select menu
+			(let ((end-index (- (length list) 1)))
+			  (if (< end-index initial-index)
+			      end-index
+			    initial-index))))
         (if nowait
             menu
           (popup-menu-event-loop menu keymap fallback
