@@ -1351,7 +1351,9 @@ during event loop. The default value is `popup-isearch-keymap'.
 
 ISEARCH-CALLBACK is a function taking one argument.  `popup-menu'
 calls ISEARCH-CALLBACK, if specified, after isearch finished or
-isearch canceled. The arguments is whole filtered list of items."
+isearch canceled. The arguments is whole filtered list of items.
+
+INITIAL-INDEX is a initial index value for `select-menu' function."
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
   (or margin-right (setq margin-right margin))
