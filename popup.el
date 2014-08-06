@@ -270,9 +270,13 @@ ITEM is not string."
                            sublist
                            document
                            symbol
-                           summary)
+                           summary
+                           rawindex)
   "Utility function to make popup item. See also
-`popup-item-propertize'."
+`popup-item-propertize'.
+
+SUBLIST is deprecated.
+For a cascade menu, use a orglist slot of `popup-menu*'."
   (popup-item-propertize name
                          'value value
                          'popup-face face
@@ -281,7 +285,8 @@ ITEM is not string."
                          'document document
                          'symbol symbol
                          'summary summary
-                         'sublist sublist))
+                         'sublist sublist
+                         'rawindex rawindex))
 
 (defsubst popup-item-value (item)               (popup-item-property item 'value))
 (defsubst popup-item-value-or-self (item)       (or (popup-item-value item) item))
@@ -292,6 +297,7 @@ ITEM is not string."
 (defsubst popup-item-summary (item)             (popup-item-property item 'summary))
 (defsubst popup-item-symbol (item)              (popup-item-property item 'symbol))
 (defsubst popup-item-sublist (item)             (popup-item-property item 'sublist))
+(defsubst popup-item-rawindex (item)            (popup-item-property item 'rawindex))
 
 (defun popup-item-documentation (item)
   (let ((doc (popup-item-document item)))
@@ -1188,6 +1194,7 @@ PROMPT is a prompt string when reading events during event loop."
                                  isearch-cursor-color
                                  isearch-keymap
                                  isearch-callback
+                                 orglist
                                  &aux key binding)
   (cl-block nil
     (while (popup-live-p menu)
@@ -1215,7 +1222,10 @@ PROMPT is a prompt string when reading events during event loop."
         (let* ((item (or (popup-menu-item-of-mouse-event (elt key 0))
                          (popup-selected-item menu)))
                (index (cl-position item (popup-list menu)))
-               (sublist (popup-item-sublist item)))
+               (sublist (or (popup-item-sublist item)
+                            (popup-aif (popup-item-rawindex item)
+                                (popup-aif (nth it orglist)
+                                    (if (consp it) (cdr it)))))))
           (unless index (cl-return))
           (if sublist
               (popup-aif (let (popup-use-optimized-column-computation)
@@ -1317,6 +1327,7 @@ PROMPT is a prompt string when reading events during event loop."
                        (isearch-cursor-color popup-isearch-cursor-color)
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
+                       orglist
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost arguments are same as
@@ -1350,7 +1361,11 @@ during event loop. The default value is `popup-isearch-keymap'.
 
 ISEARCH-CALLBACK is a function taking one argument.  `popup-menu'
 calls ISEARCH-CALLBACK, if specified, after isearch finished or
-isearch canceled. The arguments is whole filtered list of items."
+isearch canceled. The arguments is whole filtered list of items.
+
+ORGLIST is the value that is equal to the given list to
+`popup-cascade-menu'.
+If the popup menu format is not cascade, This value is no need."
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
   (or margin-right (setq margin-right margin))
@@ -1374,7 +1389,10 @@ isearch canceled. The arguments is whole filtered list of items."
                            :parent-offset parent-offset))
   (unwind-protect
       (progn
-        (popup-set-list menu list)
+        (popup-set-list menu
+                        (cl-loop for e in list
+                                 for idx = 0 then (1+ idx)
+                                 collect (popup-make-item e :rawindex idx)))
         (if cursor
             (popup-jump menu cursor)
           (popup-draw menu))
@@ -1386,7 +1404,8 @@ isearch canceled. The arguments is whole filtered list of items."
                                  :isearch isearch
                                  :isearch-cursor-color isearch-cursor-color
                                  :isearch-keymap isearch-keymap
-                                 :isearch-callback isearch-callback)))
+                                 :isearch-callback isearch-callback
+                                 :orglist orglist)))
     (unless nowait
       (popup-delete menu))))
 
@@ -1399,11 +1418,12 @@ the sub menu."
          (mapcar (lambda (item)
                    (if (consp item)
                        (popup-make-item (car item)
-                                        :sublist (cdr item)
+                                        ;; :sublist (cdr item)
                                         :symbol ">")
                      item))
                  list)
          :symbol t
+         :orglist list
          args))
 
 (provide 'popup)
