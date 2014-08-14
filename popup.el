@@ -887,6 +887,8 @@ Pages up through POPUP."
   (let ((map (make-sparse-keymap)))
     ;(define-key map "\r"        'popup-isearch-done)
     (define-key map "\C-g"      'popup-isearch-cancel)
+    (define-key map "\C-b"      'popup-isearch-close)
+    (define-key map [left]      'popup-isearch-close)
     (define-key map "\C-h"      'popup-isearch-delete)
     (define-key map (kbd "DEL") 'popup-isearch-delete)
     map))
@@ -980,6 +982,11 @@ HELP-DELAY is a delay of displaying helps."
                ((eq binding 'popup-isearch-cancel)
                 (popup-isearch-update popup "" callback)
                 (cl-return t))
+               ((eq binding 'popup-isearch-close)
+                (popup-isearch-update popup "" callback)
+                (setq unread-command-events
+                      (append (listify-key-sequence key) unread-command-events))
+                (cl-return nil))
                ((eq binding 'popup-isearch-delete)
                 (if (> (length pattern) 0)
                     (setq pattern (substring pattern 0 (1- (length pattern))))))
@@ -1192,7 +1199,7 @@ PROMPT is a prompt string when reading events during event loop."
                           :help-delay help-delay)
            (keyboard-quit))
       (setq key (popup-menu-read-key-sequence keymap prompt help-delay))
-      (setq binding (lookup-key keymap key))
+      (setq binding (and key (lookup-key keymap key)))
       (cond
        ((or (null key) (zerop (length key)))
         (unless (funcall popup-menu-show-quick-help-function menu nil :prompt prompt)
@@ -1218,7 +1225,12 @@ PROMPT is a prompt string when reading events during event loop."
                                                :margin-right (popup-margin-right menu)
                                                :scroll-bar (popup-scroll-bar menu)
                                                :parent menu
-                                               :parent-offset index))
+                                               :parent-offset index
+                                               :help-delay help-delay
+                                               :isearch isearch
+                                               :isearch-cursor-color isearch-cursor-color
+                                               :isearch-keymap isearch-keymap
+                                               :isearch-callback isearch-callback))
                   (and it (cl-return it)))
             (if (eq binding 'popup-select)
                 (cl-return (popup-item-value-or-self item))))))
