@@ -674,7 +674,8 @@ KEYMAP is a keymap that will be put on the popup contents."
         (popup-save-buffer-state
           (goto-char (point-max))
           (dotimes (i newlines)
-            (if (= (char-before) ?\n)
+            (if (and (char-before)
+                     (= (char-before) ?\n))
                 (delete-char -1)))))))
   nil)
 
