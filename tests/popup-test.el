@@ -628,6 +628,10 @@ Qux" :nowait t)
     (should (popup-test-helper-popup-selected-item "Baz")))
 
   (popup-test-with-common-setup
+    (setq popup (popup-menu* '("Foo" "Bar" "Baz") :initial-index 2 :height 1 :scroll-bar t :nowait t))
+    (should (popup-test-helper-popup-selected-item "Baz")))
+
+  (popup-test-with-common-setup
     (setq popup (popup-menu* '("Foo" "Bar" "Baz") :initial-index -1 :nowait t))
     (should (popup-test-helper-popup-selected-item "Foo")))
 
