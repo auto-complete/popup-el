@@ -1384,8 +1384,8 @@ If `INITIAL-INDEX' is non-nil, this is an initial index value for
             (popup-jump menu cursor)
           (popup-draw menu))
         (when initial-index
-          (dotimes (counter (min (- (length list) 1) initial-index))
-              (popup-next menu)))
+          (dotimes (_i (min (- (length list) 1) initial-index))
+            (popup-next menu)))
         (if nowait
             menu
           (popup-menu-event-loop menu keymap fallback
