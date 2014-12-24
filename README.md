@@ -28,16 +28,8 @@ Screenshots
 Installation
 ------------
 
-Install `popup.el` into your `load-path` directory. If you have
-`install-elisp` or `auto-install`, you also be able to install
-`popup.el` like:
-
-    ;; install-elisp
-    (install-elisp "https://github.com/m2ym/popup-el/raw/master/popup.el")
-    ;; auto-install
-    (auto-install-from-url "https://github.com/m2ym/popup-el/raw/master/popup.el")
-
-popwin is tested under GNU Emacs 22 or later.
+You can install `popup.el` from [MELPA](http://melpa.org/) with package.el.
+popwin is tested under GNU Emacs 24 or later.
 
 Popup Items
 -----------
