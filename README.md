@@ -1,7 +1,7 @@
 popup.el
 ========
 
-[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.png)](http://travis-ci.org/auto-complete/popup-el)
+[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.png)](http://travis-ci.org/auto-complete/popup-el) [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 Overview
 --------
@@ -333,3 +333,8 @@ Here is an example:
 ----
 
 Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>
+
+[melpa-link]: http://melpa.org/#/popup
+[melpa-stable-link]: http://melpa.org/#/popup
+[melpa-badge]: http://melpa.org/packages/popup-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/popup-badge.svg
