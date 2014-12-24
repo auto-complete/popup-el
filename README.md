@@ -1,7 +1,7 @@
 popup.el
 ========
 
-[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.png)](http://travis-ci.org/auto-complete/popup-el)
+[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.png)](http://travis-ci.org/auto-complete/popup-el) [![melpa badge][melpa-badge]][melpa-link] [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
 Overview
 --------
@@ -28,16 +28,8 @@ Screenshots
 Installation
 ------------
 
-Install `popup.el` into your `load-path` directory. If you have
-`install-elisp` or `auto-install`, you also be able to install
-`popup.el` like:
-
-    ;; install-elisp
-    (install-elisp "https://github.com/m2ym/popup-el/raw/master/popup.el")
-    ;; auto-install
-    (auto-install-from-url "https://github.com/m2ym/popup-el/raw/master/popup.el")
-
-popwin is tested under GNU Emacs 22 or later.
+You can install `popup.el` from [MELPA](http://melpa.org/) with package.el.
+popwin is tested under GNU Emacs 24 or later.
 
 Popup Items
 -----------
@@ -341,3 +333,8 @@ Here is an example:
 ----
 
 Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>
+
+[melpa-link]: http://melpa.org/#/popup
+[melpa-stable-link]: http://melpa.org/#/popup
+[melpa-badge]: http://melpa.org/packages/popup-badge.svg
+[melpa-stable-badge]: http://stable.melpa.org/packages/popup-badge.svg
