@@ -5,6 +5,11 @@
 (when (< (frame-width) (length "long long long long line"))
   (set-frame-size (selected-frame) 80 35))
 
+(defun popup-test-helper-posn-col-row (dummy)
+  "This function is workaround. Because `posn-col-row' and `posn-at-point'
+can not work well in batch mode."
+  (cons (current-column) (line-number-at-pos (point))))
+
 (defmacro popup-test-with-common-setup (&rest body)
   (declare (indent 0) (debug t))
   `(save-excursion
@@ -12,8 +17,11 @@
        (switch-to-buffer (current-buffer))
        (delete-other-windows)
        (erase-buffer)
-       ,@body
-       )))
+       (if noninteractive
+           (cl-letf (((symbol-function 'posn-col-row)
+                      #'popup-test-helper-posn-col-row))
+             ,@body)
+         ,@body))))
 
 (defun popup-test-helper-line-move-visual (arg)
   "This function is workaround. Because `line-move-visual' can not work well in
