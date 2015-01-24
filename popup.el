@@ -1168,7 +1168,7 @@ PROMPT is a prompt string when reading events during event loop."
         (use-global-map old-global-map)
         (if timer (cancel-timer timer))))))
 
-(defun popup-menu-fallback (event default))
+(defun popup-menu-fallback (event default menu))
 
 (cl-defun popup-menu-event-loop (menu
                                  keymap
@@ -1245,7 +1245,7 @@ PROMPT is a prompt string when reading events during event loop."
        ((commandp binding)
         (call-interactively binding))
        (t
-        (funcall fallback key (key-binding key)))))))
+        (funcall fallback key (key-binding key) menu))))))
 
 (defun popup-preferred-width (list)
   "Return the preferred width to show LIST beautifully."
