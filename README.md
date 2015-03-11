@@ -335,6 +335,6 @@ Here is an example:
 Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>
 
 [melpa-link]: http://melpa.org/#/popup
-[melpa-stable-link]: http://melpa.org/#/popup
+[melpa-stable-link]: http://stable.melpa.org/#/popup
 [melpa-badge]: http://melpa.org/packages/popup-badge.svg
 [melpa-stable-badge]: http://stable.melpa.org/packages/popup-badge.svg
