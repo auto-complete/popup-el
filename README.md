@@ -15,15 +15,15 @@ Screenshots
 
 **Tooltip**
 
-![](http://cx4a.org/software/popup/popup1.png)
+![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup1.png)
 
 **Popup Menu**
 
-![](http://cx4a.org/software/popup/popup2.png)
+![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup2.png)
 
 **Popup Cascade Menu**
 
-![](http://cx4a.org/software/popup/popup3.png)
+![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup3.png)
 
 Installation
 ------------
@@ -332,7 +332,7 @@ Here is an example:
 
 ----
 
-Copyright (C) 2011  Tomohiro Matsuyama <<tomo@cx4a.org>>
+Copyright (C) 2011-2015  Tomohiro Matsuyama <<m2ym.pub@gmail.com>>
 
 [melpa-link]: http://melpa.org/#/popup
 [melpa-stable-link]: http://stable.melpa.org/#/popup
