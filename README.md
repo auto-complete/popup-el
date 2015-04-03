@@ -228,6 +228,7 @@ Scroll up `N` items of the `POPUP`. This won't wrap.
 ### Function: `popup-isearch`
 
     popup-isearch popup &key cursor-color keymap callback help-delay
+    isearch-electric
     => boolean
 
 Enter incremental search event loop of `POPUP`.
@@ -274,7 +275,8 @@ select an item of a list.
     popup-menu* list &key point around width height margin margin-left
     margin-right scroll-bar symbol parent parent-offset keymap
     fallback help-delay nowait prompt isearch isearch-cursor-color
-    isearch-keymap isearch-callback initial-index => selected-value
+    isearch-keymap isearch-callback isearch-electric initial-index
+    => selected-value
 
 Show a popup menu of `LIST` at `POINT`. This function returns the value
 of the selected item. Almost all arguments are same as `popup-create`
@@ -308,6 +310,9 @@ during event loop. The default value is `popup-isearch-keymap`.
 `ISEARCH-CALLBACK` is a function taking one argument.  `popup-menu`
 calls `ISEARCH-CALLBACK`, if specified, after isearch finished or
 isearch canceled. The arguments is whole filtered list of items.
+
+If `ISEARCH-ELECTRIC` is non-nil popup will be closed when filtered
+list contains 1 element.
 
 If `INITIAL-INDEX` is non-nil, this is an initial index value for
 `popup-select`. Only positive integer is valid.
