@@ -934,7 +934,8 @@ Pages up through POPUP."
                          (cursor-color popup-isearch-cursor-color)
                          (keymap popup-isearch-keymap)
                          callback
-                         help-delay)
+                         help-delay
+			 isearch-electric)
   "Start isearch on POPUP. This function is synchronized, meaning
 event loop waits for quiting of isearch.
 
@@ -948,7 +949,10 @@ CALLBACK is a function taking one argument. `popup-isearch' calls
 CALLBACK, if specified, after isearch finished or isearch
 canceled. The arguments is whole filtered list of items.
 
-HELP-DELAY is a delay of displaying helps."
+HELP-DELAY is a delay of displaying helps.
+
+If ISEARCH-ELECTRIC is set to non-nil, isearch will exit isearch
+as soon as filtered list has 1 completion."
   (let ((list (popup-original-list popup))
         (pattern (or (popup-pattern popup) ""))
         (old-cursor-color (frame-parameter (selected-frame) 'cursor-color))
@@ -986,7 +990,9 @@ HELP-DELAY is a delay of displaying helps."
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
                 (cl-return nil)))
-              (popup-isearch-update popup pattern callback))))
+              (popup-isearch-update popup pattern callback)
+	      (if (and isearch-electric (= 1 (length (popup-list popup))))
+		  (cl-return nil)))))
       (if old-cursor-color
           (set-cursor-color old-cursor-color)))))
 
@@ -1180,6 +1186,7 @@ PROMPT is a prompt string when reading events during event loop."
                                  isearch-cursor-color
                                  isearch-keymap
                                  isearch-callback
+				 isearch-electric
                                  &aux key binding)
   (cl-block nil
     (while (popup-live-p menu)
@@ -1188,8 +1195,11 @@ PROMPT is a prompt string when reading events during event loop."
                           :cursor-color isearch-cursor-color
                           :keymap isearch-keymap
                           :callback isearch-callback
-                          :help-delay help-delay)
+                          :help-delay help-delay
+			  :isearch-electric isearch-electric)
            (keyboard-quit))
+      (if (and isearch-electric (= 1 (length (popup-list menu))))
+	  (cl-return (popup-item-value-or-self (popup-selected-item menu))))
       (setq key (popup-menu-read-key-sequence keymap prompt help-delay))
       (setq binding (and key (lookup-key keymap key)))
       (cond
@@ -1241,7 +1251,8 @@ PROMPT is a prompt string when reading events during event loop."
                        :cursor-color isearch-cursor-color
                        :keymap isearch-keymap
                        :callback isearch-callback
-                       :help-delay help-delay))
+                       :help-delay help-delay
+		       :isearch-electric isearch-electric))
        ((commandp binding)
         (call-interactively binding))
        (t
@@ -1309,13 +1320,14 @@ PROMPT is a prompt string when reading events during event loop."
                        (isearch-cursor-color popup-isearch-cursor-color)
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
+		       isearch-electric
                        initial-index
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost arguments are same as
 `popup-create' except for KEYMAP, FALLBACK, HELP-DELAY, PROMPT,
-ISEARCH, ISEARCH-CURSOR-COLOR, ISEARCH-KEYMAP, and
-ISEARCH-CALLBACK.
+ISEARCH, ISEARCH-CURSOR-COLOR, ISEARCH-KEYMAP, ISEARCH-ELECTRIC
+and ISEARCH-CALLBACK.
 
 If KEYMAP is a keymap which is used when processing events during
 event loop.
@@ -1344,6 +1356,9 @@ during event loop. The default value is `popup-isearch-keymap'.
 ISEARCH-CALLBACK is a function taking one argument.  `popup-menu'
 calls ISEARCH-CALLBACK, if specified, after isearch finished or
 isearch canceled. The arguments is whole filtered list of items.
+
+If ISEARCH-ELECTRIC is non-nil popup will be closed when filtered
+list contains 1 element.
 
 If `INITIAL-INDEX' is non-nil, this is an initial index value for
 `popup-select'. Only positive integer is valid."
@@ -1385,7 +1400,8 @@ If `INITIAL-INDEX' is non-nil, this is an initial index value for
                                  :isearch isearch
                                  :isearch-cursor-color isearch-cursor-color
                                  :isearch-keymap isearch-keymap
-                                 :isearch-callback isearch-callback)))
+                                 :isearch-callback isearch-callback
+				 :isearch-electric isearch-electric)))
     (unless nowait
       (popup-delete menu))))
 
