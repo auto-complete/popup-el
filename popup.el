@@ -4,7 +4,7 @@
 
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Keywords: lisp
-;; Version: 0.5.2
+;; Version: 0.5.3
 ;; Package-Requires: ((cl-lib "0.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 (require 'cl-lib)
 
-(defconst popup-version "0.5.2")
+(defconst popup-version "0.5.3")
 
 
 
@@ -919,11 +919,11 @@ Pages up through POPUP."
                             (propertize pattern 'face 'isearch-fail)
                           pattern)))
 
-(defun popup-isearch-update (popup pattern &optional callback)
+(defun popup-isearch-update (popup filter pattern &optional callback)
   (setf (popup-cursor popup) 0
         (popup-scroll-top popup) 0
         (popup-pattern popup) pattern)
-  (let ((list (popup-isearch-filter-list pattern (popup-original-list popup))))
+  (let ((list (funcall filter pattern (popup-original-list popup))))
     (popup-set-filtered-list popup list)
     (if callback
         (funcall callback list)))
@@ -931,12 +931,15 @@ Pages up through POPUP."
 
 (cl-defun popup-isearch (popup
                          &key
+                         (filter 'popup-isearch-filter-list)
                          (cursor-color popup-isearch-cursor-color)
                          (keymap popup-isearch-keymap)
                          callback
                          help-delay)
   "Start isearch on POPUP. This function is synchronized, meaning
 event loop waits for quiting of isearch.
+
+FILTER is function with two argumenst to perform popup items filtering.
 
 CURSOR-COLOR is a cursor color during isearch. The default value
 is `popup-isearch-cursor-color'.
@@ -972,10 +975,10 @@ HELP-DELAY is a delay of displaying helps."
                ((eq binding 'popup-isearch-done)
                 (cl-return nil))
                ((eq binding 'popup-isearch-cancel)
-                (popup-isearch-update popup "" callback)
+                (popup-isearch-update popup filter "" callback)
                 (cl-return t))
                ((eq binding 'popup-isearch-close)
-                (popup-isearch-update popup "" callback)
+                (popup-isearch-update popup filter "" callback)
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
                 (cl-return nil))
@@ -986,7 +989,7 @@ HELP-DELAY is a delay of displaying helps."
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
                 (cl-return nil)))
-              (popup-isearch-update popup pattern callback))))
+              (popup-isearch-update popup filter pattern callback))))
       (if old-cursor-color
           (set-cursor-color old-cursor-color)))))
 
@@ -1177,6 +1180,7 @@ PROMPT is a prompt string when reading events during event loop."
                                  prompt
                                  help-delay
                                  isearch
+                                 isearch-filter
                                  isearch-cursor-color
                                  isearch-keymap
                                  isearch-callback
@@ -1185,6 +1189,7 @@ PROMPT is a prompt string when reading events during event loop."
     (while (popup-live-p menu)
       (and isearch
            (popup-isearch menu
+                          :filter isearch-filter
                           :cursor-color isearch-cursor-color
                           :keymap isearch-keymap
                           :callback isearch-callback
@@ -1220,6 +1225,7 @@ PROMPT is a prompt string when reading events during event loop."
                                                :parent-offset index
                                                :help-delay help-delay
                                                :isearch isearch
+                                               :isearch-filter isearch-filter
                                                :isearch-cursor-color isearch-cursor-color
                                                :isearch-keymap isearch-keymap
                                                :isearch-callback isearch-callback))
@@ -1238,6 +1244,7 @@ PROMPT is a prompt string when reading events during event loop."
         (popup-menu-show-help menu))
        ((eq binding 'popup-isearch)
         (popup-isearch menu
+                       :filter 'isearch-filter
                        :cursor-color isearch-cursor-color
                        :keymap isearch-keymap
                        :callback isearch-callback
@@ -1306,6 +1313,7 @@ PROMPT is a prompt string when reading events during event loop."
                        nowait
                        prompt
                        isearch
+                       (isearch-filter 'popup-isearch-filter-list)
                        (isearch-cursor-color popup-isearch-cursor-color)
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
@@ -1314,7 +1322,7 @@ PROMPT is a prompt string when reading events during event loop."
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost arguments are same as
 `popup-create' except for KEYMAP, FALLBACK, HELP-DELAY, PROMPT,
-ISEARCH, ISEARCH-CURSOR-COLOR, ISEARCH-KEYMAP, and
+ISEARCH, ISEARCH-FILTER, ISEARCH-CURSOR-COLOR, ISEARCH-KEYMAP, and
 ISEARCH-CALLBACK.
 
 If KEYMAP is a keymap which is used when processing events during
@@ -1334,6 +1342,9 @@ PROMPT is a prompt string when reading events during event loop.
 
 If ISEARCH is non-nil, do isearch as soon as displaying the popup
 menu.
+
+ISEARCH-FILTER is a filtering function taking two arguments:
+search pattern and list of items. Returns a list of matching items.
 
 ISEARCH-CURSOR-COLOR is a cursor color during isearch. The
 default value is `popup-isearch-cursor-color'.
@@ -1383,6 +1394,7 @@ If `INITIAL-INDEX' is non-nil, this is an initial index value for
                                  :prompt prompt
                                  :help-delay help-delay
                                  :isearch isearch
+                                 :isearch-filter isearch-filter
                                  :isearch-cursor-color isearch-cursor-color
                                  :isearch-keymap isearch-keymap
                                  :isearch-callback isearch-callback)))
