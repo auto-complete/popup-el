@@ -378,16 +378,15 @@ usual."
       (put-text-property start (length content) 'face face content))
     (when mouse-face
       (put-text-property 0 (length content) 'mouse-face mouse-face content))
-    (unless (overlay-get overlay 'dangle)
-      (overlay-put overlay 'display (concat prefix (substring content 0 1)))
-      (setq prefix nil
-            content (concat (substring content 1))))
-    (overlay-put overlay
-                 'after-string
-                 (concat prefix
-                         content
-                         scroll-bar-char
-                         postfix))))
+    (let ((prop (if (overlay-get overlay 'dangle)
+                    'after-string
+                  'display)))
+      (overlay-put overlay
+                   prop
+                   (concat prefix
+                           content
+                           scroll-bar-char
+                           postfix)))))
 
 (cl-defun popup-create-line-string (popup
                                     string
