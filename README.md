@@ -334,6 +334,15 @@ Here is an example:
 
     (popup-cascade-menu '(("Top1" "Sub1" "Sub2") "Top2"))
 
+
+### Customize Variables
+
+#### `popup-isearch-regexp-builder-function`
+
+Function used to construct a regexp from a pattern. You may for instance
+provide a function that replaces spaces by '.+' if you like helm or ivy style
+of completion. Default value is `#'regexp-quote`.
+
 ----
 
 Copyright (C) 2011-2015  Tomohiro Matsuyama <<m2ym.pub@gmail.com>>
