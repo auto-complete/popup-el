@@ -5,7 +5,7 @@
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Keywords: lisp
 ;; Version: 0.5.3
-;; Package-Requires: ((cl-lib "0.3"))
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
