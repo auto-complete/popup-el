@@ -31,6 +31,9 @@ Installation
 You can install `popup.el` from [MELPA](https://melpa.org/) with package.el.
 popwin is tested under GNU Emacs 24 or later.
 
+Alternatively, users of Debian 9 or later or Ubuntu 16.04 or later may
+simply `apt-get install elpa-popup`.
+
 Popup Items
 -----------
 
