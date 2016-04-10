@@ -1250,7 +1250,7 @@ PROMPT is a prompt string when reading events during event loop."
         (popup-menu-show-help menu))
        ((eq binding 'popup-isearch)
         (popup-isearch menu
-                       :filter 'isearch-filter
+                       :filter isearch-filter
                        :cursor-color isearch-cursor-color
                        :keymap isearch-keymap
                        :callback isearch-callback
