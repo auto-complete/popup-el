@@ -179,7 +179,7 @@ buffer."
   :prefix "popup-")
 
 (defface popup-face
-  '((t (:background "lightgray" :foreground "black")))
+  '((t (:inherit default :background "lightgray" :foreground "black")))
   "Face for popup."
   :group 'popup)
 
