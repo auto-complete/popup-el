@@ -868,7 +868,7 @@ Pages up through POPUP."
 ;;; Popup Incremental Search
 
 (defface popup-isearch-match
-  '((t (:background "sky blue")))
+  '((t (:inherit default :background "sky blue")))
   "Popup isearch match face."
   :group 'popup)
 
@@ -1100,7 +1100,7 @@ PROMPT is a prompt string when reading events during event loop."
   :group 'popup)
 
 (defface popup-menu-selection-face
-  '((t (:background "steelblue" :foreground "white")))
+  '((t (:inherit default :background "steelblue" :foreground "white")))
   "Face for popup menu selection."
   :group 'popup)
 
