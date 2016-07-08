@@ -882,6 +882,7 @@ Pages up through POPUP."
     (define-key map [left]      'popup-isearch-close)
     (define-key map "\C-h"      'popup-isearch-delete)
     (define-key map (kbd "DEL") 'popup-isearch-delete)
+    (define-key map (kbd "C-y") 'popup-isearch-yank)
     map))
 
 (defvar popup-menu-show-quick-help-function 'popup-menu-show-quick-help
@@ -990,6 +991,9 @@ HELP-DELAY is a delay of displaying helps."
                ((eq binding 'popup-isearch-delete)
                 (if (> (length pattern) 0)
                     (setq pattern (substring pattern 0 (1- (length pattern))))))
+               ((eq binding 'popup-isearch-yank)
+                (popup-isearch-update popup filter (car kill-ring) callback)
+                (cl-return nil))
                (t
                 (setq unread-command-events
                       (append (listify-key-sequence key) unread-command-events))
