@@ -61,7 +61,7 @@ If there is a problem, please set it nil.")
      (when it ,@body)))
 
 (defun popup-x-to-string (x)
-  "Convert any object to string effeciently.
+  "Convert any object to string efficiently.
 This is faster than `prin1-to-string' in many cases."
   (cl-typecase x
     (string x)
