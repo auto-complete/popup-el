@@ -22,7 +22,7 @@
 
 ;;; Commentary:
 
-;; popup.el is a visual popup user interface library for Emacs. This
+;; popup.el is a visual popup user interface library for Emacs.  This
 ;; provides a basic API and common UI widgets such as popup tooltips
 ;; and popup menus.
 ;; See README.markdown for more information.
@@ -38,8 +38,8 @@
 ;;; Utilities
 
 (defun popup-calculate-max-width (max-width)
-  "Determines whether the width desired is
-character or window proportion based, And returns the result."
+  "Determines whether the width with MAX-WIDTH desired is character or window \
+proportion based, And return the result."
   (cl-typecase max-width
     (integer max-width)
     (float (* (ceiling (/ (round (* max-width (window-width))) 10.0)) 10))))
