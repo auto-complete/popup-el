@@ -4,7 +4,7 @@
 
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Keywords: lisp
-;; Version: 0.5.3
+;; Version: 0.5.4
 ;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 
 (require 'cl-lib)
 
-(defconst popup-version "0.5.3")
+(defconst popup-version "0.5.4")
 
 
 
