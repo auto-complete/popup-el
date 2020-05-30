@@ -30,6 +30,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'display-line-numbers)
 
 (defconst popup-version "0.5.5")
 
