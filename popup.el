@@ -4,7 +4,7 @@
 
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Keywords: lisp
-;; Version: 0.5.5
+;; Version: 0.5.6
 ;; Package-Requires: ((emacs "26.1") (cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 (require 'cl-lib)
 (require 'display-line-numbers)
 
-(defconst popup-version "0.5.5")
+(defconst popup-version "0.5.6")
 
 
 
