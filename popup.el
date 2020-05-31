@@ -439,7 +439,7 @@ usual."
   "Return a proper direction when displaying a popup on this
 window. HEIGHT is the a height of the popup, and ROW is a line
 number at the point."
-  (let* ((remaining-rows (- (max 1 (- (window-height)
+  (let* ((remaining-rows (- (max 1 (- (window-text-height)
                                       (if mode-line-format 1 0)
                                       (if header-line-format 1 0)))
                             (count-lines (window-start) (point))))
