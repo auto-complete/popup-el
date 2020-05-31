@@ -879,7 +879,7 @@ Pages up through POPUP."
 
 (defvar popup-isearch-keymap
   (let ((map (make-sparse-keymap)))
-    ;(define-key map "\r"        'popup-isearch-done)
+    ;;(define-key map "\r"        'popup-isearch-done)
     (define-key map "\C-g"      'popup-isearch-cancel)
     (define-key map "\C-b"      'popup-isearch-close)
     (define-key map [left]      'popup-isearch-close)
