@@ -5,7 +5,7 @@
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Keywords: lisp
 ;; Version: 0.5.7
-;; Package-Requires: ((emacs "26.1") (cl-lib "0.5"))
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'display-line-numbers)
 
 (defconst popup-version "0.5.7")
 
@@ -151,7 +150,7 @@ untouched."
 
 (defun popup-vertical-motion (column direction)
   "A portable version of `vertical-motion'."
-  (when display-line-numbers-mode
+  (when (bound-and-true-p display-line-numbers-mode)
     (setq column (- column (line-number-display-width 'columns))))
   (if (>= emacs-major-version 23)
       (vertical-motion (cons column direction))
