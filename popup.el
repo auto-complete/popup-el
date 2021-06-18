@@ -33,6 +33,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'mule)
 
 (defconst popup-version "0.5.8")
 
@@ -237,6 +238,19 @@ existed value with `nil' property."
 ITEM is not string."
   (if (stringp item)
       (get-text-property 0 property item)))
+
+(defun popup-replace-displayable (str &optional rep)
+  "Replace non-displayable character from STR.
+
+Optional argument REP is the replacement string of non-displayable character."
+  (unless rep (setq rep ""))
+  (let ((result ""))
+    (mapcar (lambda (ch)
+              (setq result (concat result
+                                   (if (char-displayable-p ch) (string ch)
+                                     rep))))
+            str)
+    result))
 
 (cl-defun popup-make-item (name
                            &key
@@ -1056,6 +1070,8 @@ PROMPT is a prompt string when reading events during event loop."
   (unless nostrip
     ;; TODO strip text (mainly face) properties
     (setq string (substring-no-properties string)))
+
+  (setq string (popup-replace-displayable string))
 
   (and (eq margin t) (setq margin 1))
   (or margin-left (setq margin-left margin))
