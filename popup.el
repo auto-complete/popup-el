@@ -245,11 +245,11 @@ ITEM is not string."
 Optional argument REP is the replacement string of non-displayable character."
   (unless rep (setq rep ""))
   (let ((result ""))
-    (mapcar (lambda (ch)
-              (setq result (concat result
-                                   (if (char-displayable-p ch) (string ch)
-                                     rep))))
-            str)
+    (mapc (lambda (ch)
+            (setq result (concat result
+                                 (if (char-displayable-p ch) (string ch)
+                                   rep))))
+          str)
     result))
 
 (cl-defun popup-make-item (name
