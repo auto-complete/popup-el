@@ -1051,6 +1051,7 @@ HELP-DELAY is a delay of displaying helps."
                      nostrip
                      prompt
                      face
+                     &allow-other-keys
                      &aux tip lines)
   "Show a tooltip of STRING at POINT. This function is
 synchronized unless NOWAIT specified. Almost all arguments are
