@@ -1050,6 +1050,7 @@ HELP-DELAY is a delay of displaying helps."
                      nowait
                      nostrip
                      prompt
+                     face
                      &aux tip lines)
   "Show a tooltip of STRING at POINT. This function is
 synchronized unless NOWAIT specified. Almost all arguments are
@@ -1063,7 +1064,9 @@ tooltip instance without entering event loop.
 
 If `NOSTRIP` is non-nil, `STRING` properties are not stripped.
 
-PROMPT is a prompt string when reading events during event loop."
+PROMPT is a prompt string when reading events during event loop.
+
+If FACE is non-nil, it will be used instead of face `popup-tip-face'."
   (if (bufferp string)
       (setq string (with-current-buffer string (buffer-string))))
 
@@ -1088,7 +1091,7 @@ PROMPT is a prompt string when reading events during event loop."
                           :margin-left margin-left
                           :margin-right margin-right
                           :scroll-bar scroll-bar
-                          :face 'popup-tip-face
+                          :face (or face 'popup-tip-face)
                           :parent parent
                           :parent-offset parent-offset))
 
