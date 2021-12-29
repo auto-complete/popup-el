@@ -7,7 +7,7 @@
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
 ;; URL: https://github.com/auto-complete/popup-el
 ;; Keywords: lisp
-;; Version: 0.5.8
+;; Version: 0.5.9
 ;; Package-Requires: ((emacs "24.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 (require 'cl-lib)
 (require 'mule)
 
-(defconst popup-version "0.5.8")
+(defconst popup-version "0.5.9")
 
 
 
@@ -1355,6 +1355,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
                        initial-index
+                       &allow-other-keys
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost all arguments are the same as in
