@@ -1355,6 +1355,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
                        (isearch-keymap popup-isearch-keymap)
                        isearch-callback
                        initial-index
+                       &allow-other-keys
                        &aux menu event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost all arguments are the same as in
