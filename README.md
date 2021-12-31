@@ -341,7 +341,7 @@ of completion. Default value is `#'regexp-quote`.
 ----
 
 Copyright (C) 2011-2015  Tomohiro Matsuyama <<m2ym.pub@gmail.com>><br/>
-Copyright (C) 2020-2021  Jen-Chieh Shen <<jcs090218@gmail.com>>
+Copyright (C) 2020-2022  Jen-Chieh Shen <<jcs090218@gmail.com>>
 
 [melpa-link]: https://melpa.org/#/popup
 [melpa-stable-link]: https://stable.melpa.org/#/popup
