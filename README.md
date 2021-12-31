@@ -3,7 +3,7 @@
 
 # popup.el
 
-[![Build Status](https://secure.travis-ci.org/auto-complete/popup-el.svg)](http://travis-ci.org/auto-complete/popup-el) 
+[![CI](https://github.com/auto-complete/popup-el/actions/workflows/test.yml/badge.svg)](https://github.com/auto-complete/popup-el/actions/workflows/test.yml)
 
 ## Overview
 
