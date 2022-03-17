@@ -1,29 +1,30 @@
 SHELL := /usr/bin/env bash
 
 EMACS ?= emacs
-CASK ?= cask
+EASK ?= eask
 
-PKG-FILES := popup.el
+TEST-FILES := $(shell ls test/grammarly-*.el)
 
-TEST-FILES := $(shell ls test/popup-*.el)
+.PHONY: clean checkdoc lint install compile unix-test
 
-.PHONY: clean checkdoc lint unix-build unix-compile	unix-test
+ci: clean install compile
 
-unix-ci: clean unix-build unix-compile
+clean:
+	@echo "Cleaning..."
+	$(EASK) clean-all
 
-unix-build:
-	$(CASK) install
+install:
+	@echo "Installing..."
+	$(EASK) install
 
-unix-compile:
+compile:
 	@echo "Compiling..."
-	@$(CASK) $(EMACS) -Q --batch \
-		-L . \
-		--eval '(setq byte-compile-error-on-warn t)' \
-		-f batch-byte-compile $(PKG-FILES)
+	$(EASK) compile
+
+lint:
+	@echo "Linting..."
+	$(EASK) lint
 
 unix-test:
 	@echo "Testing..."
-	$(CASK) exec ert-runner -L . $(LOAD-TEST-FILES) -t '!no-win' -t '!org'
-
-clean:
-	rm -rf .cask *.elc
+	$(EASK) exec ert-runner -L . $(LOAD-TEST-FILES) -t '!no-win' -t '!org'
