@@ -1,7 +1,11 @@
 (source "gnu")
 (source "melpa")
 
+(package "popup" "0.5.9" "Visual Popup User Interface")
+
 (package-file "popup.el")
+
+(depends-on "emacs" "24.3")
 
 (development
  (depends-on "ert"))
