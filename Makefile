@@ -3,15 +3,21 @@ SHELL := /usr/bin/env bash
 EMACS ?= emacs
 EASK ?= eask
 
-TEST-FILES := $(shell ls test/grammarly-*.el)
+TEST-FILES := $(shell ls test/popup-*.el)
 
-.PHONY: clean checkdoc lint install compile unix-test
+.PHONY: clean package install compile lint unix-test
 
-ci: clean install compile
+ci: clean package install compile
 
 clean:
 	@echo "Cleaning..."
 	$(EASK) clean-all
+
+package:
+	@echo "Packaging..."
+	$(EASK) autoloads
+	$(EASK) pkg-file
+	$(EASK) package
 
 install:
 	@echo "Installing..."
