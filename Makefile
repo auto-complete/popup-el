@@ -5,18 +5,12 @@ EASK ?= eask
 
 TEST-FILES := $(shell ls test/popup-*.el)
 
-.PHONY: clean package install compile lint unix-test
+.PHONY: clean checkdoc lint package install compile test
 
 ci: clean package install compile
 
-clean:
-	@echo "Cleaning..."
-	$(EASK) clean-all
-
 package:
 	@echo "Packaging..."
-	$(EASK) autoloads
-	$(EASK) pkg-file
 	$(EASK) package
 
 install:
@@ -27,10 +21,9 @@ compile:
 	@echo "Compiling..."
 	$(EASK) compile
 
-lint:
-	@echo "Linting..."
-	$(EASK) lint
-
-unix-test:
+test:
 	@echo "Testing..."
 	$(EASK) exec ert-runner -L . $(LOAD-TEST-FILES) -t '!no-win' -t '!org'
+
+clean:
+	rm -rf .cask *.elc
