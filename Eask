@@ -2,6 +2,9 @@
          "0.5.9"
          "Visual Popup User Interface")
 
+(website-url "https://github.com/auto-complete/popup-el")
+(keywords "lisp")
+
 (package-file "popup.el")
 
 (source "gnu")
