@@ -42,7 +42,7 @@
 ;;; Utilities
 
 (defun popup-calculate-max-width (max-width)
-  "Determines whether the width with MAX-WIDTH desired is character or window \
+  "Determines whether the width with MAX-WIDTH desired is character or window
 proportion based, And return the result."
   (cl-typecase max-width
     (integer max-width)
