@@ -242,14 +242,17 @@ ITEM is not string."
 (defun popup-replace-displayable (str &optional rep)
   "Replace non-displayable character from STR.
 
-Optional argument REP is the replacement string of non-displayable character."
-  (let ((result "") (rep (or rep "")))
-    (mapc (lambda (ch)
-            (setq result (concat result
-                                 (if (char-displayable-p ch) (string ch)
-                                   rep))))
-          str)
-    result))
+Optional argument REP is the replacement string of
+non-displayable character."
+  (let ((rep (or rep ""))
+        (results (list)))
+    (dolist (string (split-string str ""))
+      (let* ((char (string-to-char string))
+             (string (if (char-displayable-p char)
+                         string
+                       rep)))
+        (push string results)))
+    (string-join (reverse results))))
 
 (cl-defun popup-make-item (name
                            &key
