@@ -1,3 +1,4 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![melpa badge][melpa-badge]][melpa-link] 
 [![melpa stable badge][melpa-stable-badge]][melpa-stable-link]
 
@@ -13,17 +14,9 @@ popup menus.
 
 ## Screenshots
 
-**Tooltip**
-
-![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup1.png)
-
-**Popup Menu**
-
-![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup2.png)
-
-**Popup Cascade Menu**
-
-![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup3.png)
+| Tooltip                                                                                    | Popup Menu                                                                                 | Popup Cascade Menu                                                                         |
+|:-------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------|
+| ![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup1.png) | ![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup2.png) | ![](https://raw.githubusercontent.com/auto-complete/popup-el/master/etc/images/popup3.png) |
 
 ## Installation
 
@@ -60,15 +53,19 @@ All of properties can be accessed by `popup-item-<property>` utility function.
 
 ### Function: `popup-item-propertize`
 
-    popup-item-propertize item &rest properties => item
+```
+popup-item-propertize item &rest properties => item
+```
 
 Same as `propertize` except that this avoids overriding existed value
 with `nil` property.
 
 ### Function: `popup-make-item`
 
-    popup-make-item name &key value popup-face selection-face sublist
-    document symbol summary => item
+```
+popup-make-item name &key value popup-face selection-face sublist
+document symbol summary => item
+```
 
 The utility function of `popup-item-propertize`.
 
@@ -106,9 +103,11 @@ All of these fields can be accessed by `popup-<field>` function.
 
 ### Function: `popup-create`
 
-    popup-create point width height &key min-height max-width around face
-    selection-face scroll-bar margin-left margin-right symbol parent
-    parent-offset => popup
+```
+popup-create point width height &key min-height max-width around face
+selection-face scroll-bar margin-left margin-right symbol parent
+parent-offset => popup
+```
 
 Create a popup instance at `POINT` with `WIDTH` and `HEIGHT`.
 
@@ -144,55 +143,73 @@ will be a root instance.
 
 Here is an example:
 
-    (setq popup (popup-create (point) 10 10))
-    (popup-set-list popup '("Foo" "Bar" "Baz"))
-    (popup-draw popup)
-    ;; do something here
-    (popup-delete popup)
+```elisp
+(setq popup (popup-create (point) 10 10))
+(popup-set-list popup '("Foo" "Bar" "Baz"))
+(popup-draw popup)
+;; do something here
+(popup-delete popup)
+```
 
 ### Function: `popup-delete`
 
-    popup-delete popup
+```
+popup-delete popup
+```
 
 Delete the `POPUP`.
 
 ### Function: `popup-live-p`
 
-    popup-live-p popup => boolean
+```
+popup-live-p popup => boolean
+```
 
 ### Function: `popup-set-list`
 
-    popup-set-list popup list
+```
+popup-set-list popup list
+```
 
 Set the contents of the `POPUP`. `LIST` has to be popup items.
 
 ### Function: `popup-draw`
 
-    popup-draw popup
+```
+popup-draw popup
+```
 
 Draw the contents of the `POPUP`.
 
 ### Function: `popup-hide`
 
-    popup-hide popup
+```
+popup-hide popup
+```
 
 Hide the `POPUP`. To show again, call `popup-draw`.
 
 ### Function: `popup-hidden-p`
 
-    popup-hidden-p popup
+```
+popup-hidden-p popup
+```
 
 Return non-nil if the `POPUP` is hidden.
 
 ### Function: `popup-select`
 
+```
     popup-select popup index
+```
 
 Select the item of `INDEX` of the `POPUP`.
 
 ### Function: `popup-selected-item`
 
-    popup-selected-item popup => item
+```
+popup-selected-item popup => item
+```
 
 Return the selected item of the `POPUP`.
 
@@ -200,32 +217,42 @@ Return non-nil if the `POPUP` is still alive.
 
 ### Function: `popup-next`
 
-    popup-next popup
+```
+popup-next popup
+```
 
 Select the next item of the `POPUP`.
 
 ### Function: `popup-previous`
 
-    popup-previous popup
+```
+popup-previous popup
+```
 
 Select the next item of the `POPUP`.
 
 ### Function: `popup-scroll-down`
 
-    popup-scroll-down popup n
+```
+popup-scroll-down popup n
+```
 
 Scroll down `N` items of the `POPUP`. This won't wrap.
 
 ### Function: `popup-scroll-up`
 
-    popup-scroll-up popup n
+```
+popup-scroll-up popup n
+```
 
 Scroll up `N` items of the `POPUP`. This won't wrap.
 
 ### Function: `popup-isearch`
 
-    popup-isearch popup &key cursor-color keymap callback help-delay
-    => boolean
+```
+popup-isearch popup &key cursor-color keymap callback help-delay
+=> boolean
+```
 
 Enter incremental search event loop of `POPUP`.
 
@@ -236,9 +263,11 @@ something about what cursor points to.
 
 ### Function: `popup-tip`
 
-    popup-tip string &key point around width height min-height max-width
-    truncate margin margin-left margin-right scroll-bar parent
-    parent-offset nowait nostrip prompt
+```
+popup-tip string &key point around width height min-height max-width
+truncate margin margin-left margin-right scroll-bar parent
+parent-offset nowait nostrip prompt
+```
 
 Show a tooltip with message `STRING` at `POINT`. This function is
 synchronized unless `NOWAIT` specified. Almost all arguments are same as
@@ -256,8 +285,10 @@ loop.
 
 Here is an example:
 
-    (popup-tip "Hello, World!")
-    ;; reach here after the tooltip disappeared
+```elisp
+(popup-tip "Hello, World!")
+;; reach here after the tooltip disappeared
+```
 
 ## Popup Menus
 
@@ -266,10 +297,12 @@ select an item of a list.
 
 ### Function: `popup-menu*`
 
-    popup-menu* list &key point around width height margin margin-left
-    margin-right scroll-bar symbol parent parent-offset keymap
-    fallback help-delay nowait prompt isearch isearch-filter isearch-cursor-color
-    isearch-keymap isearch-callback initial-index => selected-value
+```elisp
+popup-menu* list &key point around width height margin margin-left
+margin-right scroll-bar symbol parent parent-offset keymap
+fallback help-delay nowait prompt isearch isearch-filter isearch-cursor-color
+isearch-keymap isearch-callback initial-index => selected-value
+```
 
 Show a popup menu of `LIST` at `POINT`. This function returns the value
 of the selected item. Almost all arguments are same as `popup-create`
@@ -313,11 +346,13 @@ If `INITIAL-INDEX` is non-nil, this is an initial index value for
 
 Here is an example:
 
-    (popup-menu* '("Foo" "Bar" "Baz"))
-    ;; => "Baz" if you select Baz
-    (popup-menu* (list (popup-make-item "Yes" :value t)
-                       (popup-make-item "No" :value nil)))
-    ;; => t if you select Yes
+```elisp
+(popup-menu* '("Foo" "Bar" "Baz"))
+;; => "Baz" if you select Baz
+(popup-menu* (list (popup-make-item "Yes" :value t)
+                   (popup-make-item "No" :value nil)))
+;; => t if you select Yes
+```
 
 ### Function: `popup-cascade-menu`
 
@@ -327,8 +362,9 @@ sub-menu if the element is a cons cell formed `(ITEM . SUBLIST)` where
 
 Here is an example:
 
-    (popup-cascade-menu '(("Top1" "Sub1" "Sub2") "Top2"))
-
+```elisp
+(popup-cascade-menu '(("Top1" "Sub1" "Sub2") "Top2"))
+```
 
 ### Customize Variables
 
