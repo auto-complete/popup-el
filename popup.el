@@ -1,7 +1,7 @@
 ;;; popup.el --- Visual Popup User Interface
 
 ;; Copyright (C) 2009-2015  Tomohiro Matsuyama
-;; Copyright (c) 2020-2022 Jen-Chieh Shen
+;; Copyright (c) 2020-2023 Jen-Chieh Shen
 
 ;; Author: Tomohiro Matsuyama <m2ym.pub@gmail.com>
 ;; Maintainer: Shen, Jen-Chieh <jcs090218@gmail.com>
