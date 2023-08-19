@@ -1,4 +1,4 @@
-;;; popup.el --- Visual Popup User Interface
+;;; popup.el --- Visual Popup User Interface  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2009-2015  Tomohiro Matsuyama
 ;; Copyright (c) 2020-2023 Jen-Chieh Shen
