@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "popup"
          "0.5.9"
          "Visual Popup User Interface")
