@@ -1195,6 +1195,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
                                  temp-global-map old-global-map)
       (define-key temp-global-map [menu-bar] (lookup-key old-global-map [menu-bar]))
       (define-key temp-global-map [tool-bar] (lookup-key old-global-map [tool-bar]))
+      (define-key temp-global-map [tab-bar] (lookup-key old-global-map [tab-bar]))
       (set-keymap-parent overriding-terminal-local-map keymap)
       (if (current-local-map)
           (define-key overriding-terminal-local-map [menu-bar]
