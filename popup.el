@@ -117,7 +117,6 @@ untouched."
     (let ((tab-width 4)
           (fill-column width)
           (left-margin 0)
-          (kinsoku-limit 1)
           indent-tabs-mode
           row rows)
       (insert string)
@@ -540,7 +539,6 @@ KEYMAP is a keymap that will be put on the popup contents."
                            (if symbol 2 0)))
            margin-left-cancel
            (window (selected-window))
-           (window-start (window-start))
            (window-hscroll (window-hscroll))
            (window-width (window-width))
            (right (+ column popup-width))
@@ -679,7 +677,7 @@ KEYMAP is a keymap that will be put on the popup contents."
       (when (> newlines 0)
         (popup-save-buffer-state
           (goto-char (point-max))
-          (dotimes (i newlines)
+          (dotimes (_i newlines)
             (if (and (char-before)
                      (= (char-before) ?\n))
                 (delete-char -1)))))))
@@ -687,7 +685,7 @@ KEYMAP is a keymap that will be put on the popup contents."
 
 (defun popup-draw (popup)
   "Draw POPUP."
-  (cl-loop for (ov olddisplay) in (popup-invis-overlays popup)
+  (cl-loop for (ov _olddisplay) in (popup-invis-overlays popup)
            do (overlay-put ov 'display ""))
 
   (cl-loop with height = (popup-height popup)
@@ -859,13 +857,13 @@ KEYMAP is a keymap that will be put on the popup contents."
 (defun popup-page-next (popup)
   "Select next item of POPUP per `popup-height' range.
 Pages down through POPUP."
-  (dotimes (counter (1- (popup-height popup)))
+  (dotimes (_counter (1- (popup-height popup)))
     (popup-next popup)))
 
 (defun popup-page-previous (popup)
   "Select previous item of POPUP per `popup-height' range.
 Pages up through POPUP."
-  (dotimes (counter (1- (popup-height popup)))
+  (dotimes (_counter (1- (popup-height popup)))
     (popup-previous popup)))
 
 (defun popup-scroll-down (popup &optional n)
@@ -979,8 +977,7 @@ CALLBACK, if specified, after isearch finished or isearch
 canceled. The arguments is whole filtered list of items.
 
 HELP-DELAY is a delay of displaying helps."
-  (let ((list (popup-original-list popup))
-        (pattern (or (popup-pattern popup) ""))
+  (let ((pattern (or (popup-pattern popup) ""))
         (old-cursor-color (frame-parameter (selected-frame) 'cursor-color))
         prompt key binding)
     (unwind-protect
@@ -1208,7 +1205,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
         (use-global-map old-global-map)
         (if timer (cancel-timer timer))))))
 
-(defun popup-menu-fallback (event default))
+(defun popup-menu-fallback (_event _default))
 
 (cl-defun popup-menu-event-loop (menu
                                  keymap
@@ -1356,7 +1353,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
                        isearch-callback
                        initial-index
                        &allow-other-keys
-                       &aux menu event)
+                       &aux menu _event)
   "Show a popup menu of LIST at POINT. This function returns a
 value of the selected item. Almost all arguments are the same as in
 `popup-create', except for KEYMAP, FALLBACK, HELP-DELAY, PROMPT,
