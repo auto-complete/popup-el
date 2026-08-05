@@ -1208,7 +1208,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
         (use-global-map old-global-map)
         (if timer (cancel-timer timer))))))
 
-(defun popup-menu-fallback (event default))
+(defun popup-menu-fallback (event default menu))
 
 (cl-defun popup-menu-event-loop (menu
                                  keymap
@@ -1289,7 +1289,7 @@ If FACE is non-nil, it will be used instead of face `popup-tip-face'."
        ((commandp binding)
         (call-interactively binding))
        (t
-        (funcall fallback key (key-binding key)))))))
+        (funcall fallback key (key-binding key) menu))))))
 
 (defun popup-preferred-width (list)
   "Return the preferred width to show LIST beautifully."
